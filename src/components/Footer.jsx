@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { FaGithub, FaLinkedin, FaInstagram } from 'react-icons/fa'
 
 // TODO: Replace '#' with real social profile URLs
@@ -15,25 +16,27 @@ export default function Footer() {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       flexWrap: 'wrap', gap: '1rem'
     }}>
-      <p style={{ fontSize: '0.8rem', color: '#8892A4', letterSpacing: '0.02em' }}>
-        &copy; 2026 <span style={{ color: '#F0F4FF' }}>Prince Kaushal</span> &mdash; Built with React &amp; Three.js
+      <p style={{ fontSize: '0.78rem', color: '#8892A4', letterSpacing: '0.02em' }}>
+        &copy; 2026 <span style={{ color: '#F0F4FF', fontFamily: "'Archivo', sans-serif", fontWeight: 700 }}>Prince Kaushal</span>
+        {' '}&mdash; Designed &amp; built by Prince
       </p>
       <div style={{ display: 'flex', gap: '0.65rem' }}>
         {SOCIALS.map(s => (
-          <a
+          <motion.a
             key={s.label}
             href={s.href}
             aria-label={s.label}
+            whileHover={{ color: '#39FF6A', borderColor: '#39FF6A', scale: 1.1 }}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: '32px', height: '32px', borderRadius: '6px',
+              width: '32px', height: '32px', borderRadius: '5px',
               border: '1px solid rgba(255,255,255,0.08)',
               color: '#8892A4', textDecoration: 'none',
               transition: 'color 0.2s, border-color 0.2s'
             }}
           >
             {s.icon}
-          </a>
+          </motion.a>
         ))}
       </div>
     </footer>

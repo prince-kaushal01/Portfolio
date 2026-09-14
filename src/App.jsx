@@ -8,6 +8,7 @@ import Skills from './components/Skills.jsx'
 import Projects from './components/Projects.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
+import Navbar from './components/Navbar.jsx'
 
 export default function App() {
   const [loaded, setLoaded] = useState(() => {
@@ -29,6 +30,7 @@ export default function App() {
   return (
     <>
       <CustomCursor />
+      <Navbar />
       {!loaded && <Loader onComplete={handleLoaded} />}
       <SmoothScrollProvider>
         <div style={{ opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}>

@@ -61,7 +61,7 @@ export default function Contact() {
       <div style={{
         position: 'absolute', bottom: '10%', left: '50%', transform: 'translateX(-50%)',
         width: '60vw', height: '40vw', maxWidth: '800px',
-        background: 'radial-gradient(ellipse, rgba(0,217,255,0.05) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse, rgba(57,255,106,0.05) 0%, transparent 65%)',
         pointerEvents: 'none'
       }} />
 
@@ -73,19 +73,20 @@ export default function Contact() {
         style={{ maxWidth: '820px', margin: '0 auto', position: 'relative', zIndex: 1 }}
       >
         <motion.p variants={item} style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: '0.75rem', letterSpacing: '0.25em',
-          color: '#00D9FF', textTransform: 'uppercase', marginBottom: '0.5rem'
+          fontFamily: "'Archivo', sans-serif",
+          fontSize: '0.72rem', letterSpacing: '0.25em',
+          color: '#39FF6A', textTransform: 'uppercase', marginBottom: '0.5rem',
+          fontWeight: 700
         }}>// Say Hello</motion.p>
 
         <motion.h2 variants={item} style={{
-          fontFamily: "'Space Grotesk', sans-serif",
+          fontFamily: "'Archivo', sans-serif",
           fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-          fontWeight: 700, letterSpacing: '-0.02em',
+          fontWeight: 900, letterSpacing: '-0.02em',
           color: '#F0F4FF', marginBottom: '3rem', lineHeight: 1.1
         }}>
           Let's Build<br />
-          <span style={{ color: '#00D9FF' }}>Something</span>
+          <span style={{ color: '#39FF6A' }}>Something</span>
         </motion.h2>
 
         <div style={{
@@ -112,12 +113,12 @@ export default function Contact() {
                 value={form[field.name]}
                 onChange={handleChange}
                 required
-                whileFocus={{ borderColor: '#00D9FF', boxShadow: '0 0 0 2px rgba(0,217,255,0.12)' }}
+                whileFocus={{ borderColor: '#39FF6A', boxShadow: '0 0 0 2px rgba(57,255,106,0.12)' }}
                 style={{
                   width: '100%', padding: '0.85rem 1rem',
-                  background: '#12151C',
+                  background: '#111111',
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px', outline: 'none',
+                  borderRadius: '5px', outline: 'none',
                   color: '#F0F4FF', fontSize: '0.9rem',
                   fontFamily: "'Inter', sans-serif",
                   transition: 'border-color 0.2s'
@@ -131,12 +132,12 @@ export default function Contact() {
               value={form.message}
               onChange={handleChange}
               required
-              whileFocus={{ borderColor: '#00D9FF', boxShadow: '0 0 0 2px rgba(0,217,255,0.12)' }}
+              whileFocus={{ borderColor: '#39FF6A', boxShadow: '0 0 0 2px rgba(57,255,106,0.12)' }}
               style={{
                 width: '100%', padding: '0.85rem 1rem',
-                background: '#12151C',
+                background: '#111111',
                 border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px', outline: 'none',
+                borderRadius: '5px', outline: 'none',
                 color: '#F0F4FF', fontSize: '0.9rem',
                 fontFamily: "'Inter', sans-serif",
                 resize: 'vertical', transition: 'border-color 0.2s'
@@ -145,19 +146,23 @@ export default function Contact() {
             <motion.button
               type="submit"
               disabled={status === 'sending'}
-              whileHover={{ scale: 1.02, boxShadow: '0 0 24px rgba(0,217,255,0.3)' }}
+              whileHover={{
+                scale: 1.02,
+                boxShadow: '0 0 24px rgba(57,255,106,0.3)',
+                filter: 'brightness(1.1)'
+              }}
               whileTap={{ scale: 0.98 }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                 padding: '0.9rem 1.8rem',
                 background: status === 'success'
-                  ? 'linear-gradient(135deg, #34D399, #059669)'
-                  : 'linear-gradient(135deg, #00D9FF, #0EA5E9)',
-                border: 'none', borderRadius: '8px',
-                color: '#0A0A0B', fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.9rem', fontWeight: 600,
+                  ? '#34D399'
+                  : '#39FF6A',
+                border: 'none', borderRadius: '5px',
+                color: '#0A0A0A', fontFamily: "'Archivo', sans-serif",
+                fontSize: '0.85rem', fontWeight: 700,
                 cursor: status === 'sending' ? 'wait' : 'none',
-                letterSpacing: '0.02em'
+                letterSpacing: '0.08em', textTransform: 'uppercase'
               }}
             >
               {status === 'sending' ? 'Sending...' :
@@ -171,8 +176,8 @@ export default function Contact() {
           <motion.div variants={item} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div>
               <h3 style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.75rem', fontWeight: 600,
+                fontFamily: "'Archivo', sans-serif",
+                fontSize: '0.72rem', fontWeight: 700,
                 color: '#8892A4', letterSpacing: '0.2em',
                 textTransform: 'uppercase', marginBottom: '1rem'
               }}>Direct Contact</h3>
@@ -182,14 +187,14 @@ export default function Contact() {
                   color: '#F0F4FF', textDecoration: 'none', fontSize: '0.9rem',
                   transition: 'color 0.2s'
                 }}>
-                  <Mail size={16} color="#00D9FF" />
+                  <Mail size={16} color="#39FF6A" />
                   princekaushal357@gmail.com
                 </a>
                 <a href="tel:+919667979426" style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
                   color: '#F0F4FF', textDecoration: 'none', fontSize: '0.9rem',
                 }}>
-                  <Phone size={16} color="#00D9FF" />
+                  <Phone size={16} color="#39FF6A" />
                   +91 9667979426
                 </a>
               </div>
@@ -197,8 +202,8 @@ export default function Contact() {
 
             <div>
               <h3 style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '0.75rem', fontWeight: 600,
+                fontFamily: "'Archivo', sans-serif",
+                fontSize: '0.72rem', fontWeight: 700,
                 color: '#8892A4', letterSpacing: '0.2em',
                 textTransform: 'uppercase', marginBottom: '1rem'
               }}>Social</h3>
@@ -209,10 +214,10 @@ export default function Contact() {
                     key={s.label}
                     href={s.href}
                     aria-label={s.label}
-                    whileHover={{ scale: 1.1, color: '#00D9FF', borderColor: '#00D9FF' }}
+                    whileHover={{ scale: 1.1, color: '#39FF6A', borderColor: '#39FF6A' }}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      width: '42px', height: '42px', borderRadius: '8px',
+                      width: '42px', height: '42px', borderRadius: '5px',
                       border: '1px solid rgba(255,255,255,0.1)',
                       color: '#8892A4', textDecoration: 'none',
                       transition: 'color 0.2s, border-color 0.2s'

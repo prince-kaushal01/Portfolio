@@ -7,10 +7,10 @@
 }
 
 :root {
-  --bg-primary: #0A0A0B;
-  --bg-surface: #12151C;
-  --accent-cyan: #00D9FF;
-  --accent-blue: #0EA5E9;
+  --bg-primary: #0A0A0A;
+  --bg-surface: #111111;
+  --accent-primary: #39FF6A;
+  --accent-glow: rgba(57, 255, 106, 0.15);
   --text-primary: #F0F4FF;
   --text-muted: #8892A4;
   --border: rgba(255,255,255,0.08);
@@ -34,7 +34,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 900;
 }
 
 /* Noise overlay */
@@ -55,11 +56,11 @@ body.loading {
 
 /* Selection */
 ::selection {
-  background: rgba(0, 217, 255, 0.25);
+  background: rgba(57, 255, 106, 0.25);
   color: #fff;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 2px; }

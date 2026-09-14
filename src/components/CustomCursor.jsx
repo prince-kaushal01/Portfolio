@@ -48,11 +48,11 @@ export default function CustomCursor() {
           width: hovered ? 8 : 6,
           height: hovered ? 8 : 6,
           borderRadius: '50%',
-          background: '#00D9FF',
+          background: '#39FF6A',
           pointerEvents: 'none',
           zIndex: 99999,
           transform: 'translate(-50%, -50%)',
-          boxShadow: '0 0 8px #00D9FF',
+          boxShadow: '0 0 8px #39FF6A',
           transition: 'width 0.15s, height 0.15s'
         }}
       />
@@ -63,14 +63,14 @@ export default function CustomCursor() {
           y: pos.y - (hovered ? 20 : 14),
           width: hovered ? 40 : 28,
           height: hovered ? 40 : 28,
-          borderColor: hovered ? '#00D9FF' : 'rgba(0,217,255,0.4)',
+          borderColor: hovered ? '#39FF6A' : 'rgba(57,255,106,0.4)',
           opacity: hovered ? 0.9 : 0.5,
         }}
         transition={{ type: 'spring', stiffness: 120, damping: 20, mass: 0.5 }}
         style={{
           position: 'fixed',
           borderRadius: '50%',
-          border: '1.5px solid rgba(0,217,255,0.4)',
+          border: '1.5px solid rgba(57,255,106,0.4)',
           pointerEvents: 'none',
           zIndex: 99998,
         }}

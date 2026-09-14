@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Menu } from 'lucide-react'
 import { getLenis } from './SmoothScrollProvider.jsx'
@@ -11,15 +11,18 @@ const LINKS = [
   { label: 'Contact', href: '#contact' },
 ]
 
+const SOCIALS = [
+  { label: 'GitHub', href: '#' },
+  { label: 'LinkedIn', href: '#' },
+  { label: 'Instagram', href: '#' },
+  { label: 'Email', href: 'mailto:princekaushal357@gmail.com' },
+]
+
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
   const [active, setActive] = useState('#home')
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', onScroll)
-
     // Active section tracking
     const sections = LINKS.map(l => document.querySelector(l.href))
     const observer = new IntersectionObserver(
@@ -33,7 +36,6 @@ export default function Navbar() {
     sections.forEach(s => s && observer.observe(s))
 
     return () => {
-      window.removeEventListener('scroll', onScroll)
       observer.disconnect()
     }
   }, [])
@@ -58,122 +60,112 @@ export default function Navbar() {
           padding: '0 clamp(1rem, 4vw, 3rem)',
           height: '72px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: scrolled ? 'rgba(10,10,11,0.85)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
-          transition: 'background 0.3s, backdrop-filter 0.3s, border-color 0.3s'
+          background: 'transparent',
         }}
       >
         {/* Logo */}
         <button
           onClick={() => scrollTo('#home')}
           style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontSize: '1.25rem', fontWeight: 700,
+            fontFamily: "'Archivo', sans-serif",
+            fontSize: '1.25rem', fontWeight: 900,
             color: '#F0F4FF', background: 'none', border: 'none',
-            cursor: 'none', letterSpacing: '0.05em'
+            cursor: 'none', letterSpacing: '0.04em'
           }}
         >
-          Prince<span style={{ color: '#00D9FF' }}>.</span>
+          PK<span style={{ color: '#39FF6A' }}>.</span>
         </button>
 
-        {/* Desktop links */}
-        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}
-          className="hidden md:flex">
-          {LINKS.map(l => (
-            <NavLink key={l.href} {...l} active={active === l.href} onClick={() => scrollTo(l.href)} />
-          ))}
-        </div>
-
-        {/* Mobile hamburger */}
+        {/* Menu trigger */}
         <button
           onClick={() => setMenuOpen(o => !o)}
           style={{
             background: 'none', border: 'none', color: '#F0F4FF',
-            cursor: 'none', display: 'none', padding: '8px'
+            cursor: 'none', padding: '8px', display: 'flex',
+            alignItems: 'center', justifyContent: 'center'
           }}
-          className="flex md:hidden"
-          aria-label="Toggle menu"
+          aria-label="Open menu"
         >
-          <Menu size={22} />
+          <Menu size={30} strokeWidth={1.5} />
         </button>
       </motion.nav>
 
-      {/* Mobile full-screen menu */}
+      {/* Right-side navigation panel */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 999,
-              background: '#0A0A0B',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: '2.5rem'
-            }}
-          >
+          <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.68)' }}>
+            <motion.aside
+              key="side-menu"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                position: 'absolute', top: 0, right: 0, bottom: 0,
+                width: 'min(100%, 480px)',
+                background: '#303030',
+                padding: 'clamp(5rem, 12vh, 8rem) clamp(2rem, 6vw, 5rem)',
+                color: '#F0F4FF',
+              }}
+            >
             <button
               onClick={() => setMenuOpen(false)}
               style={{
-                position: 'absolute', top: '1.5rem', right: 'clamp(1rem,4vw,3rem)',
+                position: 'absolute', top: '1.5rem', right: '2rem',
                 background: 'none', border: 'none', color: '#F0F4FF', cursor: 'none'
               }}
+              aria-label="Close menu"
             >
-              <X size={24} />
+              <X size={32} strokeWidth={1.5} />
             </button>
-            {LINKS.map((l, i) => (
-              <motion.button
-                key={l.href}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.07 }}
-                onClick={() => scrollTo(l.href)}
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: 'clamp(2rem, 7vw, 3.5rem)',
-                  fontWeight: 700, color: active === l.href ? '#00D9FF' : '#F0F4FF',
-                  background: 'none', border: 'none', cursor: 'none',
-                  letterSpacing: '-0.01em'
-                }}
-              >
-                {l.label}
-              </motion.button>
-            ))}
-          </motion.div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(2rem, 7vw, 5rem)' }}>
+                <div>
+                  <p style={{ color: '#b5b5b5', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '2rem' }}>Social</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {SOCIALS.map(social => (
+                      <a key={social.label} href={social.href} style={{ color: '#F0F4FF', textDecoration: 'none', fontSize: '1rem' }}>
+                        {social.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p style={{ color: '#b5b5b5', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '2rem' }}>Menu</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {LINKS.map((link, index) => (
+                      <motion.button
+                        key={link.href}
+                        initial={{ opacity: 0, x: 18 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.06 + 0.15 }}
+                        onClick={() => scrollTo(link.href)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '0.7rem',
+                          padding: 0, border: 0, background: 'none', cursor: 'none',
+                          color: active === link.href ? '#F0F4FF' : '#F0F4FF',
+                          fontSize: '1rem', textAlign: 'left'
+                        }}
+                      >
+                        <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: ['#FBBF24', '#60A5FA', '#2DD4BF', '#818CF8', '#39FF6A'][index] }} />
+                        {link.label}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ position: 'absolute', left: 'clamp(2rem, 6vw, 5rem)', right: 'clamp(2rem, 6vw, 5rem)', bottom: '3rem' }}>
+                <p style={{ color: '#b5b5b5', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '1.5rem' }}>Get in touch</p>
+                <a href="mailto:princekaushal357@gmail.com" style={{ color: '#F0F4FF', textDecoration: 'none', fontSize: '1rem' }}>
+                  princekaushal357@gmail.com
+                </a>
+              </div>
+            </motion.aside>
+          </div>
         )}
       </AnimatePresence>
     </>
-  )
-}
-
-function NavLink({ label, active, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        fontFamily: "'Inter', sans-serif",
-        fontSize: '0.85rem', fontWeight: 500,
-        color: active ? '#00D9FF' : '#8892A4',
-        background: 'none', border: 'none', cursor: 'none',
-        letterSpacing: '0.03em', position: 'relative',
-        padding: '4px 0', transition: 'color 0.2s'
-      }}
-    >
-      {label}
-      {active && (
-        <motion.div
-          layoutId="nav-underline"
-          style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            height: '1.5px', background: '#00D9FF',
-            boxShadow: '0 0 8px #00D9FF'
-          }}
-        />
-      )}
-    </button>
   )
 }

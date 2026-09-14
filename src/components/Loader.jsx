@@ -37,7 +37,7 @@ export default function Loader({ onComplete }) {
           transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
           style={{
             position: 'fixed', inset: 0, zIndex: 10000,
-            background: '#0A0A0B',
+            background: '#0A0A0A',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
             gap: '2rem'
@@ -49,10 +49,10 @@ export default function Loader({ onComplete }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             style={{
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Archivo', sans-serif",
               fontSize: '1.5rem',
-              fontWeight: 700,
-              color: '#00D9FF',
+              fontWeight: 900,
+              color: '#39FF6A',
               letterSpacing: '0.3em',
               textTransform: 'uppercase'
             }}
@@ -66,9 +66,9 @@ export default function Loader({ onComplete }) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             style={{
-              fontFamily: "'Space Grotesk', monospace",
+              fontFamily: "'Archivo', sans-serif",
               fontSize: 'clamp(3rem, 10vw, 6rem)',
-              fontWeight: 700,
+              fontWeight: 900,
               color: '#F0F4FF',
               lineHeight: 1,
               letterSpacing: '-0.02em',
@@ -77,7 +77,7 @@ export default function Loader({ onComplete }) {
             }}
           >
             {String(progress).padStart(2, '0')}
-            <span style={{ color: '#00D9FF', fontSize: '0.5em' }}>%</span>
+            <span style={{ color: '#39FF6A', fontSize: '0.5em' }}>%</span>
           </motion.div>
 
           {/* Status line */}
@@ -106,9 +106,9 @@ export default function Loader({ onComplete }) {
             <motion.div
               style={{
                 height: '100%',
-                background: 'linear-gradient(90deg, #00D9FF, #0EA5E9)',
+                background: '#39FF6A',
                 width: `${progress}%`,
-                boxShadow: '0 0 12px #00D9FF'
+                boxShadow: '0 0 12px #39FF6A'
               }}
             />
           </div>
@@ -123,7 +123,7 @@ function BlinkCursor() {
     <motion.span
       animate={{ opacity: [1, 0, 1] }}
       transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-      style={{ marginLeft: '2px', color: '#00D9FF' }}
+      style={{ marginLeft: '2px', color: '#39FF6A' }}
     >_</motion.span>
   )
 }

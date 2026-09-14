@@ -27,7 +27,7 @@ export default function Hero() {
   useEffect(() => {
     const id = setInterval(() => {
       setRoleIndex(i => (i + 1) % ROLES.length)
-    }, 2200)
+    }, 3500)
     return () => clearInterval(id)
   }, [])
 
@@ -207,118 +207,187 @@ export default function Hero() {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          padding: '44px 64px 40px',
+          justifyContent: 'flex-end',
+          padding: '44px clamp(1.5rem, 7vw, 6rem) clamp(2.5rem, 9vh, 5rem)',
           pointerEvents: 'none',
           boxSizing: 'border-box',
         }}
       >
         {/* ── Headline ──────────────────────────────────────────────── */}
-        <div style={{ marginTop: 'auto' }}>
-          {/* Animated role line */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              fontSize: 'clamp(16px, 1.8vw, 22px)',
-              fontWeight: 500,
-              letterSpacing: '0.02em',
-              color: '#00D9FF',
-              marginBottom: '18px',
-              height: '1.4em',
-              overflow: 'hidden',
-            }}
-          >
-            <span>I&apos;m a</span>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={ROLES[roleIndex]}
-                initial={{ y: '100%', opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: '-100%', opacity: 0 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                style={{ display: 'inline-block', fontWeight: 600 }}
-              >
-                {ROLES[roleIndex]}
-              </motion.span>
-            </AnimatePresence>
-          </div>
-
-          {/* Name */}
+        <div style={{ marginTop: 'auto', marginBottom: 'clamp(4rem, 8vh, 5rem)', width: 'min(100%, 620px)' }}>
+          {/* Animated role heading */}
           <h1
             style={{
               margin: 0,
-              fontSize: 'clamp(44px, 7vw, 96px)',
-              fontWeight: 600,
-              fontFamily: ff,
-              letterSpacing: '-0.02em',
-              lineHeight: 1,
+              fontSize: 'clamp(2rem, 5.4vw, 4.25rem)',
+              fontWeight: 900,
+              fontFamily: "'Archivo', sans-serif",
+              letterSpacing: '-0.055em',
+              lineHeight: 0.88,
               color: textColor,
               textAlign: 'left',
+              textTransform: 'uppercase',
+              minHeight: '1.76em',
+              overflow: 'hidden',
             }}
           >
-            Prince Kaushal
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={ROLES[roleIndex]}
+                initial={{ y: '-100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '100%', opacity: 0 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                style={{ display: 'block' }}
+              >
+                <span style={{ display: 'block', color: '#39FF6A' }}>
+                  {ROLES[roleIndex].split(' ').slice(0, -1).join(' ')}
+                </span>
+                <span style={{ display: 'block', color: textColor }}>
+                  {ROLES[roleIndex].split(' ').slice(-1)}
+                </span>
+              </motion.span>
+            </AnimatePresence>
           </h1>
+
+          {/* Tagline */}
+          <p
+            style={{
+              marginTop: '28px',
+              fontSize: 'clamp(13px, 1.15vw, 14px)',
+              color: 'rgba(240,244,255,0.7)',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 400,
+              lineHeight: 1.65,
+              maxWidth: '500px',
+              letterSpacing: '0.01em',
+            }}
+          >
+            Hi! I&apos;m <strong style={{ color: textColor, fontWeight: 600 }}>Prince</strong>. A creative Full-Stack Developer with 2+ years of experience building high-performance, scalable, and responsive web solutions.
+          </p>
 
           {/* Buttons */}
           <div
             style={{
-              marginTop: '36px',
+              marginTop: '30px',
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '16px',
+              gap: '14px',
               pointerEvents: 'auto',
             }}
           >
             <motion.a
               href="/resume.pdf"
               download
-              whileHover={{ scale: 1.03, boxShadow: '0 0 24px rgba(0,217,255,0.35)' }}
+              whileHover={{ scale: 1.02, boxShadow: '0 0 24px rgba(57,255,106,0.35)', filter: 'brightness(1.1)' }}
               whileTap={{ scale: 0.97 }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '8px',
                 padding: '14px 28px',
-                background: 'linear-gradient(135deg, #00D9FF, #0EA5E9)',
-                borderRadius: '999px',
-                color: '#0A0A0B',
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '15px',
-                fontWeight: 600,
-                letterSpacing: '0.01em',
+                background: '#39FF6A',
+                borderRadius: 0,
+                color: '#0A0A0A',
+                fontFamily: "'Archivo', sans-serif",
+                fontSize: '14px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
                 textDecoration: 'none',
                 cursor: 'none',
+                textTransform: 'uppercase',
               }}
             >
-              <Download size={17} />
-              Download CV
+              <Send size={15} />
+              Let&apos;s Talk
             </motion.a>
 
             <motion.button
               onClick={scrollToContact}
-              whileHover={{ scale: 1.03, borderColor: '#00D9FF', color: '#00D9FF' }}
+              whileHover={{ scale: 1.02, borderColor: '#39FF6A', color: '#39FF6A', boxShadow: '0 0 16px rgba(57,255,106,0.2)' }}
               whileTap={{ scale: 0.97 }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '14px 28px',
+                padding: '13px 26px',
                 background: 'transparent',
-                border: '1.5px solid #f0f0ee',
-                borderRadius: '999px',
+                border: '1.5px solid rgba(240,240,238,0.5)',
+                borderRadius: '5px',
                 color: textColor,
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: '15px',
-                fontWeight: 600,
-                letterSpacing: '0.01em',
+                fontFamily: "'Archivo', sans-serif",
+                fontSize: '13px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
                 cursor: 'none',
+                textTransform: 'uppercase',
+                transition: 'border-color 0.18s, color 0.18s, box-shadow 0.18s',
               }}
             >
-              <Send size={16} />
-              Contact Me
+              <Download size={14} />
+              Download CV
             </motion.button>
           </div>
+
+          {/* Availability status */}
+          <div
+            style={{
+              marginTop: '14px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '15px',
+              color: 'rgba(240,244,255,0.62)',
+              fontFamily: "'Inter', sans-serif",
+              letterSpacing: '0.05em',
+            }}
+          >
+            <span style={{ color: 'green', fontSize: '20px', marginBottom:'5px' }}>●</span>
+            Available for full-time opportunities
+          </div>
+        </div>
+
+        <div
+          style={{
+            position: 'absolute',
+            right: 'clamp(1.5rem, 5vw, 4.5rem)',
+            bottom: 'clamp(2rem, 8vh, 4.5rem)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'clamp(2.25rem, 7vh, 4.25rem)',
+            textAlign: 'right',
+          }}
+        >
+          {[
+            ['2+', 'Years Learning'],
+            ['7+', 'Completed Projects'],
+            ['10k+', 'Working Hours'],
+          ].map(([value, label]) => (
+            <div key={label}>
+              <strong
+                style={{
+                  display: 'block',
+                  color: '#39FF6A',
+                  fontFamily: "'Archivo', sans-serif",
+                  fontSize: 'clamp(1.8rem, 3vw, 2.75rem)',
+                  lineHeight: 0.9,
+                  letterSpacing: '-0.05em',
+                }}
+              >
+                {value}
+              </strong>
+              <span
+                style={{
+                  display: 'block',
+                  marginTop: '8px',
+                  color: 'rgba(240,244,255,0.68)',
+                  fontSize: 'clamp(0.7rem, 0.9vw, 0.85rem)',
+                }}
+              >
+                {label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

@@ -1,13 +1,34 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { gsap } from 'gsap'
 import { Download, Send } from 'lucide-react'
 import PORTRAIT_URL from '../assets/face1.png'
 import GOLD_URL from '../assets/face3.png'
 
-const ROLE = 'Web Developer'
+const ROLES = ['Web Developer', 'AI Engineer', 'Full-Stack Developer', 'UI/UX Enthusiast']
 
 export default function Hero() {
   const sectionRef = useRef(null)
   const revealRef = useRef(null)
+  const roleRef = useRef(null)
+  const [roleIndex, setRoleIndex] = useState(0)
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setRoleIndex(current => (current + 1) % ROLES.length)
+    }, 2000)
+
+    return () => clearInterval(intervalId)
+  }, [])
+
+  useEffect(() => {
+    if (!roleRef.current) return
+
+    gsap.fromTo(
+      roleRef.current,
+      { yPercent: -100, opacity: 0 },
+      { yPercent: 0, opacity: 1, duration: 0.45, ease: 'power3.out' },
+    )
+  }, [roleIndex])
 
   useEffect(() => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
@@ -123,12 +144,12 @@ export default function Hero() {
           <h1
             className="m-0 min-h-[1.76em] overflow-hidden text-left font-[Archivo,sans-serif] text-[clamp(2rem,5.4vw,4.25rem)] font-black uppercase leading-[0.88] tracking-[-0.055em] text-[#f0f0ee]"
           >
-            <span className="block">
+            <span ref={roleRef} className="block">
               <span className="block text-[#39FF6A]">
-                {ROLE.split(' ').slice(0, -1).join(' ')}
+                {ROLES[roleIndex].split(' ').slice(0, -1).join(' ')}
               </span>
               <span className="block text-[#f0f0ee]">
-                {ROLE.split(' ').slice(-1)}
+                {ROLES[roleIndex].split(' ').slice(-1)}
               </span>
             </span>
           </h1>
@@ -152,7 +173,7 @@ export default function Hero() {
           >
             <button
               onClick={scrollToContact}
-              className="inline-flex items-center gap-2 bg-[#39FF6A] font-[Archivo,sans-serif] text-sm font-bold uppercase tracking-[0.08em] text-[#0A0A0A] no-underline"
+              className="inline-flex rounded-2xl items-center gap-2 bg-[#39FF6A] font-[Archivo,sans-serif] text-sm font-bold uppercase tracking-[0.08em] text-[#0A0A0A] no-underline"
               style={{ padding: '1rem 2.25rem' }}
             >
               <Send size={15} />
@@ -162,7 +183,7 @@ export default function Hero() {
             <a
               href="/resume.pdf"
               download
-              className="inline-flex items-center gap-2.5 rounded-[5px] border-[1.5px] border-[rgba(240,240,238,0.5)] bg-transparent font-[Archivo,sans-serif] text-[13px] font-bold uppercase tracking-[0.08em] text-[#f0f0ee]"
+              className="inline-flex items-center gap-2.5 rounded-2xl border-[1.5px] border-[rgba(240,240,238,0.5)] bg-transparent font-[Archivo,sans-serif] text-[13px] font-bold uppercase tracking-[0.08em] text-[#f0f0ee]"
               style={{ padding: '0.95rem 1.9rem' }}
             >
               <Download size={14} />
@@ -175,7 +196,7 @@ export default function Hero() {
             className="pointer-events-auto inline-flex items-center gap-2 font-[Inter,sans-serif] text-[15px] tracking-[0.05em] text-[rgba(240,244,255,0.62)]"
             style={{ marginTop: 'clamp(1rem, 2vw, 1.5rem)' }}
           >
-            <span className="mb-[3px] text-xl text-green-500">●</span>
+            <span className="mb-[6px] text-lg text-green-500">●</span>
             Available for full-time opportunities
           </div>
         </div>
@@ -209,6 +230,12 @@ export default function Hero() {
               </span>
             </div>
           ))}
+        </div>
+
+        <div className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-center md:flex">
+          <span className="font-[Inter,sans-serif] text-[0.65rem] uppercase tracking-[0.28em] text-white/30">
+            Hover Image to explore
+          </span>
         </div>
       </div>
     </section>

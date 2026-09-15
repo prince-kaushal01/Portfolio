@@ -17,7 +17,7 @@
 }
 
 html {
-  scroll-behavior: auto; /* Lenis handles smooth scroll */
+  scroll-behavior: auto;
 }
 
 body {
@@ -25,12 +25,6 @@ body {
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
-  cursor: none; /* custom cursor */
-}
-
-/* Hide default cursor site-wide; re-enable on touch */
-@media (hover: none) {
-  body { cursor: auto; }
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {
@@ -87,5 +81,4 @@ html { scrollbar-width: none; }
   border-radius: inherit;
   background: var(--accent-primary);
   box-shadow: 0 0 10px rgba(57, 255, 106, 0.55);
-  transition: transform 0.12s linear;
 }

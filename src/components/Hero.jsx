@@ -1,138 +1,79 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef } from 'react'
 import { Download, Send } from 'lucide-react'
 import PORTRAIT_URL from '../assets/face1.png'
-import GOLD_URL from '../assets/face2.png'
-import { getLenis } from './SmoothScrollProvider.jsx'
+import GOLD_URL from '../assets/face3.png'
 
-const ROLES = ['Web Developer', 'AI Engineer', 'Full-Stack Developer', 'UI/UX Enthusiast']
-
-// Shared image style: full-bleed absolute layer
-const imgLayer = {
-  position: 'absolute',
-  inset: 0,
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  objectPosition: 'center',
-  display: 'block',
-}
+const ROLE = 'Web Developer'
 
 export default function Hero() {
   const sectionRef = useRef(null)
   const revealRef = useRef(null)
-  const [roleIndex, setRoleIndex] = useState(0)
 
-  // Cycle the rotating role line
   useEffect(() => {
-    const id = setInterval(() => {
-      setRoleIndex(i => (i + 1) % ROLES.length)
-    }, 3500)
-    return () => clearInterval(id)
-  }, [])
-
-  const scrollToContact = () => {
-    const el = document.querySelector('#contact')
-    if (!el) return
-    const lenis = getLenis()
-    if (lenis) lenis.scrollTo(el, { offset: -80 })
-    else el.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  // RAF cursor-reveal — desktop only
-  useEffect(() => {
-    const isPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    if (!isPointer) return
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
 
     const section = sectionRef.current
     const reveal = revealRef.current
     if (!section || !reveal) return
 
-    // current lerped position
-    let cx = 0, cy = 0
-    // target (raw cursor)
-    let tx = 0, ty = 0
-    let rafId = null
-    let snapped = false
-    let running = false
+    let cursorX = 0
+    let cursorY = 0
+    let targetX = 0
+    let targetY = 0
+    let frameId = null
+    let active = false
 
-    const LERP = 0.22
-    const HALF_W = 55  // half of mask-size width  (110/2)
-    const HALF_H = 70  // half of mask-size height (140/2)
+    const updateReveal = () => {
+      cursorX += (targetX - cursorX) * 0.12
+      cursorY += (targetY - cursorY) * 0.12
+      reveal.style.maskPosition = `${cursorX - 110}px ${cursorY - 140}px`
+      reveal.style.webkitMaskPosition = `${cursorX - 110}px ${cursorY - 140}px`
 
-    const tick = () => {
-      const dx = tx - cx
-      const dy = ty - cy
-      cx += dx * LERP
-      cy += dy * LERP
-
-      const mx = cx - HALF_W
-      const my = cy - HALF_H
-
-      // Set both standard and -webkit- for Safari
-      reveal.style.maskPosition = `${mx}px ${my}px`
-      reveal.style.webkitMaskPosition = `${mx}px ${my}px`
-
-      // Stop when settled
-      if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3) {
-        running = false
+      if (Math.abs(targetX - cursorX) < 0.3 && Math.abs(targetY - cursorY) < 0.3) {
+        active = false
         return
       }
-      rafId = requestAnimationFrame(tick)
+      frameId = requestAnimationFrame(updateReveal)
     }
 
-    const onMouseMove = (e) => {
-      const rect = section.getBoundingClientRect()
-      tx = e.clientX - rect.left
-      ty = e.clientY - rect.top
+    const handleMouseMove = event => {
+      const bounds = section.getBoundingClientRect()
+      targetX = event.clientX - bounds.left
+      targetY = event.clientY - bounds.top
+      reveal.style.opacity = '1'
 
-      if (!snapped) {
-        // First movement: snap position immediately, show reveal
-        cx = tx
-        cy = ty
-        snapped = true
-        reveal.style.opacity = '1'
-      }
-
-      if (!running) {
-        running = true
-        rafId = requestAnimationFrame(tick)
+      if (!active) {
+        active = true
+        frameId = requestAnimationFrame(updateReveal)
       }
     }
 
-    const onMouseLeave = () => {
+    const handleMouseLeave = () => {
       reveal.style.opacity = '0'
-      snapped = false
-      running = false
-      cancelAnimationFrame(rafId)
+      active = false
+      cancelAnimationFrame(frameId)
     }
 
-    section.addEventListener('mousemove', onMouseMove)
-    section.addEventListener('mouseleave', onMouseLeave)
+    section.addEventListener('mousemove', handleMouseMove)
+    section.addEventListener('mouseleave', handleMouseLeave)
 
     return () => {
-      section.removeEventListener('mousemove', onMouseMove)
-      section.removeEventListener('mouseleave', onMouseLeave)
-      cancelAnimationFrame(rafId)
+      section.removeEventListener('mousemove', handleMouseMove)
+      section.removeEventListener('mouseleave', handleMouseLeave)
+      cancelAnimationFrame(frameId)
     }
   }, [])
 
-  // Shared font style applied inline throughout
-  const ff = "'Archivo', sans-serif"
-  const textColor = '#f0f0ee'
+  const scrollToContact = () => {
+    const el = document.querySelector('#contact')
+    el?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <section
       id="home"
       ref={sectionRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100vh',
-        overflow: 'hidden',
-        fontFamily: ff,
-        color: textColor,
-      }}
+      className="relative h-screen w-full overflow-hidden font-[Archivo,sans-serif] text-[#f0f0ee]"
     >
       {/* ── Layer 1: clean portrait ───────────────────────────────────── */}
       <img
@@ -140,7 +81,7 @@ export default function Hero() {
         alt=""
         aria-hidden="true"
         draggable={false}
-        style={{ ...imgLayer, userSelect: 'none', pointerEvents: 'none', zIndex: 0 }}
+        className="pointer-events-none absolute inset-0 z-0 block h-full w-full select-none object-cover object-center"
       />
 
       {/* ── Layer 2: gold base at 10% ─────────────────────────────────── */}
@@ -149,213 +90,103 @@ export default function Hero() {
         alt=""
         aria-hidden="true"
         draggable={false}
-        style={{
-          ...imgLayer,
-          opacity: 0.1,
-          pointerEvents: 'none',
-          userSelect: 'none',
-          zIndex: 1,
-        }}
+        className="pointer-events-none absolute inset-0 z-[1] block h-full w-full select-none object-cover object-center opacity-10"
       />
 
-      {/* ── Layer 3: gold reveal (cursor spotlight) ───────────────────── */}
+      {/* Cursor spotlight hover layer */}
       <img
         ref={revealRef}
         src={GOLD_URL}
         alt=""
         aria-hidden="true"
         draggable={false}
-        style={{
-          ...imgLayer,
-          opacity: 0,
-          pointerEvents: 'none',
-          userSelect: 'none',
-          zIndex: 2,
-          transition: 'opacity 0.4s ease-out',
-          // Soft-feathered vertical oval mask
-          maskImage:
-            'radial-gradient(closest-side, #000 62%, transparent 100%)',
-          WebkitMaskImage:
-            'radial-gradient(closest-side, #000 62%, transparent 100%)',
-          maskRepeat: 'no-repeat',
-          WebkitMaskRepeat: 'no-repeat',
-          maskSize: '110px 140px',
-          WebkitMaskSize: '110px 140px',
-          maskPosition: '-9999px -9999px',
-          WebkitMaskPosition: '-9999px -9999px',
-        }}
+        className="pointer-events-none absolute inset-0 z-[2] block h-full w-full select-none object-cover object-center opacity-0 [mask-image:radial-gradient(closest-side,#000_62%,transparent_100%)] [mask-repeat:no-repeat] [mask-size:220px_280px] [mask-position:-9999px_-9999px] [-webkit-mask-image:radial-gradient(closest-side,#000_62%,transparent_100%)] [-webkit-mask-repeat:no-repeat] [-webkit-mask-size:220px_280px] [-webkit-mask-position:-9999px_-9999px]"
       />
 
       {/* ── Layer 4: scrim ────────────────────────────────────────────── */}
       <div
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'linear-gradient(180deg, rgba(20,24,32,0.55) 0%, rgba(20,24,32,0.12) 45%, rgba(20,24,32,0.6) 100%)',
-          pointerEvents: 'none',
-          zIndex: 3,
-        }}
+        className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(20,24,32,0.55)_0%,rgba(20,24,32,0.12)_45%,rgba(20,24,32,0.6)_100%)]"
       />
 
       {/* ── Content overlay ───────────────────────────────────────────── */}
       <div
+        className="pointer-events-none relative z-[4] flex h-full flex-col justify-center"
         style={{
-          position: 'relative',
-          zIndex: 4,
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          padding: '44px clamp(1.5rem, 7vw, 6rem) clamp(2.5rem, 9vh, 5rem)',
-          pointerEvents: 'none',
-          boxSizing: 'border-box',
+          paddingTop: '22vh',
+          paddingLeft: 'clamp(1.5rem, 10vw, 100px)',
+          paddingRight: 'clamp(1.5rem, 6vw, 140px)',
         }}
       >
-        {/* ── Headline ──────────────────────────────────────────────── */}
-        <div style={{ marginTop: 'auto', marginBottom: 'clamp(4rem, 8vh, 5rem)', width: 'min(100%, 620px)' }}>
-          {/* Animated role heading */}
+        {/* ── Headline block ────────────────────────────────────────── */}
+        <div style={{ width: 'min(100%, 640px)' }}>
           <h1
-            style={{
-              margin: 0,
-              fontSize: 'clamp(2rem, 5.4vw, 4.25rem)',
-              fontWeight: 900,
-              fontFamily: "'Archivo', sans-serif",
-              letterSpacing: '-0.055em',
-              lineHeight: 0.88,
-              color: textColor,
-              textAlign: 'left',
-              textTransform: 'uppercase',
-              minHeight: '1.76em',
-              overflow: 'hidden',
-            }}
+            className="m-0 min-h-[1.76em] overflow-hidden text-left font-[Archivo,sans-serif] text-[clamp(2rem,5.4vw,4.25rem)] font-black uppercase leading-[0.88] tracking-[-0.055em] text-[#f0f0ee]"
           >
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={ROLES[roleIndex]}
-                initial={{ y: '-100%', opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: '100%', opacity: 0 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                style={{ display: 'block' }}
-              >
-                <span style={{ display: 'block', color: '#39FF6A' }}>
-                  {ROLES[roleIndex].split(' ').slice(0, -1).join(' ')}
-                </span>
-                <span style={{ display: 'block', color: textColor }}>
-                  {ROLES[roleIndex].split(' ').slice(-1)}
-                </span>
-              </motion.span>
-            </AnimatePresence>
+            <span className="block">
+              <span className="block text-[#39FF6A]">
+                {ROLE.split(' ').slice(0, -1).join(' ')}
+              </span>
+              <span className="block text-[#f0f0ee]">
+                {ROLE.split(' ').slice(-1)}
+              </span>
+            </span>
           </h1>
 
           {/* Tagline */}
           <p
+            className="max-w-[500px] font-[Inter,sans-serif] font-normal tracking-[0.01em] text-[rgba(240,244,255,0.7)]"
             style={{
-              marginTop: '28px',
-              fontSize: 'clamp(13px, 1.15vw, 14px)',
-              color: 'rgba(240,244,255,0.7)',
-              fontFamily: "'Inter', sans-serif",
-              fontWeight: 400,
+              marginTop: 'clamp(1.5rem, 3vw, 2.25rem)',
+              fontSize: 'clamp(15px, 1.3vw, 17px)',
               lineHeight: 1.65,
-              maxWidth: '500px',
-              letterSpacing: '0.01em',
             }}
           >
-            Hi! I&apos;m <strong style={{ color: textColor, fontWeight: 600 }}>Prince</strong>. A creative Full-Stack Developer with 2+ years of experience building high-performance, scalable, and responsive web solutions.
+            Hi! I&apos;m <strong className="font-semibold text-[#f0f0ee]">Prince</strong>. A creative Full-Stack Developer with 2+ years of experience building high-performance, scalable, and responsive web solutions.
           </p>
 
           {/* Buttons */}
           <div
-            style={{
-              marginTop: '30px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '14px',
-              pointerEvents: 'auto',
-            }}
+            className="pointer-events-auto flex flex-wrap items-center gap-4"
+            style={{ marginTop: 'clamp(1.75rem, 3.4vw, 2.75rem)' }}
           >
-            <motion.a
-              href="/resume.pdf"
-              download
-              whileHover={{ scale: 1.02, boxShadow: '0 0 24px rgba(57,255,106,0.35)', filter: 'brightness(1.1)' }}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '14px 28px',
-                background: '#39FF6A',
-                borderRadius: 0,
-                color: '#0A0A0A',
-                fontFamily: "'Archivo', sans-serif",
-                fontSize: '14px',
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textDecoration: 'none',
-                cursor: 'none',
-                textTransform: 'uppercase',
-              }}
+            <button
+              onClick={scrollToContact}
+              className="inline-flex items-center gap-2 bg-[#39FF6A] font-[Archivo,sans-serif] text-sm font-bold uppercase tracking-[0.08em] text-[#0A0A0A] no-underline"
+              style={{ padding: '1rem 2.25rem' }}
             >
               <Send size={15} />
               Let&apos;s Talk
-            </motion.a>
+            </button>
 
-            <motion.button
-              onClick={scrollToContact}
-              whileHover={{ scale: 1.02, borderColor: '#39FF6A', color: '#39FF6A', boxShadow: '0 0 16px rgba(57,255,106,0.2)' }}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '13px 26px',
-                background: 'transparent',
-                border: '1.5px solid rgba(240,240,238,0.5)',
-                borderRadius: '5px',
-                color: textColor,
-                fontFamily: "'Archivo', sans-serif",
-                fontSize: '13px',
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                cursor: 'none',
-                textTransform: 'uppercase',
-                transition: 'border-color 0.18s, color 0.18s, box-shadow 0.18s',
-              }}
+            <a
+              href="/resume.pdf"
+              download
+              className="inline-flex items-center gap-2.5 rounded-[5px] border-[1.5px] border-[rgba(240,240,238,0.5)] bg-transparent font-[Archivo,sans-serif] text-[13px] font-bold uppercase tracking-[0.08em] text-[#f0f0ee]"
+              style={{ padding: '0.95rem 1.9rem' }}
             >
               <Download size={14} />
               Download CV
-            </motion.button>
+            </a>
           </div>
 
           {/* Availability status */}
           <div
-            style={{
-              marginTop: '14px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '15px',
-              color: 'rgba(240,244,255,0.62)',
-              fontFamily: "'Inter', sans-serif",
-              letterSpacing: '0.05em',
-            }}
+            className="pointer-events-auto inline-flex items-center gap-2 font-[Inter,sans-serif] text-[15px] tracking-[0.05em] text-[rgba(240,244,255,0.62)]"
+            style={{ marginTop: 'clamp(1rem, 2vw, 1.5rem)' }}
           >
-            <span style={{ color: 'green', fontSize: '20px', marginBottom:'5px' }}>●</span>
+            <span className="mb-[3px] text-xl text-green-500">●</span>
             Available for full-time opportunities
           </div>
         </div>
 
+        {/* ── Stats block ───────────────────────────────────────────── */}
         <div
+          className="absolute flex flex-col text-right"
           style={{
-            position: 'absolute',
-            right: 'clamp(1.5rem, 5vw, 4.5rem)',
             bottom: 'clamp(2rem, 8vh, 4.5rem)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'clamp(2.25rem, 7vh, 4.25rem)',
-            textAlign: 'right',
+            right: 'clamp(1.5rem, 5vw, 4.5rem)',
+            gap: 'clamp(2rem, 6.5vh, 4rem)',
           }}
         >
           {[
@@ -365,24 +196,14 @@ export default function Hero() {
           ].map(([value, label]) => (
             <div key={label}>
               <strong
-                style={{
-                  display: 'block',
-                  color: '#39FF6A',
-                  fontFamily: "'Archivo', sans-serif",
-                  fontSize: 'clamp(1.8rem, 3vw, 2.75rem)',
-                  lineHeight: 0.9,
-                  letterSpacing: '-0.05em',
-                }}
+                className="block font-[Archivo,sans-serif] leading-[0.9] tracking-[-0.05em] text-[#39FF6A]"
+                style={{ fontSize: 'clamp(1.9rem, 3.2vw, 2.85rem)' }}
               >
                 {value}
               </strong>
               <span
-                style={{
-                  display: 'block',
-                  marginTop: '8px',
-                  color: 'rgba(240,244,255,0.68)',
-                  fontSize: 'clamp(0.7rem, 0.9vw, 0.85rem)',
-                }}
+                className="mt-2 block text-[rgba(240,244,255,0.68)]"
+                style={{ fontSize: 'clamp(0.7rem, 0.9vw, 0.85rem)' }}
               >
                 {label}
               </span>

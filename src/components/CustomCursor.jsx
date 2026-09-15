@@ -1,21 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 
 export default function CustomCursor() {
-  const [pos, setPos] = useState({ x: -100, y: -100 })
   const [hovered, setHovered] = useState(false)
-  const [isTouch, setIsTouch] = useState(false)
-  const posRef = useRef({ x: -100, y: -100 })
+  const [isTouch] = useState(() => window.matchMedia('(hover: none)').matches)
+  const [position, setPosition] = useState({ x: -100, y: -100 })
 
   useEffect(() => {
-    if (window.matchMedia('(hover: none)').matches) {
-      setIsTouch(true)
-      return
-    }
+    if (isTouch) return
 
     const onMove = (e) => {
-      posRef.current = { x: e.clientX, y: e.clientY }
-      setPos({ x: e.clientX, y: e.clientY })
+      setPosition({ x: e.clientX, y: e.clientY })
     }
 
     const onEnter = (e) => {
@@ -33,48 +27,16 @@ export default function CustomCursor() {
       document.removeEventListener('mouseover', onEnter)
       document.removeEventListener('mouseout', onLeave)
     }
-  }, [])
+  }, [isTouch])
 
   if (isTouch) return null
 
   return (
     <>
       {/* Dot */}
-      <motion.div
-        style={{
-          position: 'fixed',
-          top: pos.y,
-          left: pos.x,
-          width: hovered ? 8 : 6,
-          height: hovered ? 8 : 6,
-          borderRadius: '50%',
-          background: '#39FF6A',
-          pointerEvents: 'none',
-          zIndex: 99999,
-          transform: 'translate(-50%, -50%)',
-          boxShadow: '0 0 8px #39FF6A',
-          transition: 'width 0.15s, height 0.15s'
-        }}
-      />
+      <div style={{ left: position.x, top: position.y }} className={`pointer-events-none fixed z-[99999] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#39FF6A] shadow-[0_0_8px_#39FF6A] ${hovered ? 'h-2 w-2' : 'h-1.5 w-1.5'}`} />
       {/* Ring */}
-      <motion.div
-        animate={{
-          x: pos.x - (hovered ? 20 : 14),
-          y: pos.y - (hovered ? 20 : 14),
-          width: hovered ? 40 : 28,
-          height: hovered ? 40 : 28,
-          borderColor: hovered ? '#39FF6A' : 'rgba(57,255,106,0.4)',
-          opacity: hovered ? 0.9 : 0.5,
-        }}
-        transition={{ type: 'spring', stiffness: 120, damping: 20, mass: 0.5 }}
-        style={{
-          position: 'fixed',
-          borderRadius: '50%',
-          border: '1.5px solid rgba(57,255,106,0.4)',
-          pointerEvents: 'none',
-          zIndex: 99998,
-        }}
-      />
+      <div style={{ left: position.x, top: position.y }} className={`pointer-events-none fixed z-[99998] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] ${hovered ? 'h-10 w-10 border-[#39FF6A] opacity-90' : 'h-7 w-7 border-[rgba(57,255,106,0.4)] opacity-50'}`} />
     </>
   )
 }

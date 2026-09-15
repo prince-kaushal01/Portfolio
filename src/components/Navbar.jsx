@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { gsap } from 'gsap'
 import { X, Menu } from 'lucide-react'
-import { getLenis } from './SmoothScrollProvider.jsx'
 
 const LINKS = [
   { label: 'Home', href: '#home' },
@@ -18,12 +17,19 @@ const SOCIALS = [
   { label: 'Email', href: 'mailto:princekaushal357@gmail.com' },
 ]
 
+const DOT_COLORS = ['bg-amber-400', 'bg-blue-400', 'bg-teal-400', 'bg-indigo-400', 'bg-[#39FF6A]']
+
 export default function Navbar() {
   const [active, setActive] = useState('#home')
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const backdropRef = useRef(null)
+  const panelRef = useRef(null)
+  const timelineRef = useRef(null)
+  const mountedRef = useRef(false)
+
+  // ── Active section tracking ─────────────────────────────────────────
   useEffect(() => {
-    // Active section tracking
     const sections = LINKS.map(l => document.querySelector(l.href))
     const observer = new IntersectionObserver(
       entries => {
@@ -34,138 +40,151 @@ export default function Navbar() {
       { rootMargin: '-40% 0px -55% 0px' }
     )
     sections.forEach(s => s && observer.observe(s))
+    return () => observer.disconnect()
+  }, [])
+
+  // ── GSAP open/close animation ───────────────────────────────────────
+  useEffect(() => {
+    const backdrop = backdropRef.current
+    const panel = panelRef.current
+    if (!backdrop || !panel) return
+
+    timelineRef.current?.kill()
+    gsap.killTweensOf([backdrop, panel])
+
+    if (!mountedRef.current && !menuOpen) {
+      gsap.set(backdrop, { opacity: 0 })
+      gsap.set(panel, { xPercent: 100 })
+      backdrop.style.pointerEvents = 'none'
+      mountedRef.current = true
+      return
+    }
+
+    mountedRef.current = true
+
+    if (menuOpen) {
+      gsap.set(backdrop, { opacity: 0 })
+      gsap.set(panel, { xPercent: 100 })
+      backdrop.style.pointerEvents = 'auto'
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      tl.to(backdrop, { opacity: 1, duration: 0.35, ease: 'power2.out' }, 0)
+        .to(panel, { xPercent: 0, duration: 0.55, ease: 'power3.out' }, 0)
+      timelineRef.current = tl
+    } else {
+      gsap.set(backdrop, { opacity: 1 })
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.in' },
+        onComplete: () => {
+          backdrop.style.pointerEvents = 'none'
+        },
+      })
+      tl.to(panel, { xPercent: 100, duration: 0.45, ease: 'power3.in' }, 0)
+        .to(backdrop, { opacity: 0, duration: 0.3, ease: 'power2.in' }, 0.05)
+      timelineRef.current = tl
+    }
 
     return () => {
-      observer.disconnect()
+      timelineRef.current?.kill()
+      gsap.killTweensOf([backdrop, panel])
     }
-  }, [])
+  }, [menuOpen])
 
   const scrollTo = (href) => {
     setMenuOpen(false)
     const el = document.querySelector(href)
     if (!el) return
-    const lenis = getLenis()
-    if (lenis) lenis.scrollTo(el, { offset: -80 })
-    else el.scrollIntoView({ behavior: 'smooth' })
+    el.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-          padding: '0 clamp(1rem, 4vw, 3rem)',
-          height: '72px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: 'transparent',
-        }}
+      <nav
+        className="fixed left-0 right-0 top-0 z-[1000] flex h-[80px] items-center justify-between bg-transparent"
+        style={{ paddingLeft: 'clamp(1.5rem, 5vw, 3.5rem)', paddingRight: 'clamp(1.5rem, 5vw, 3.5rem)' }}
       >
         {/* Logo */}
         <button
           onClick={() => scrollTo('#home')}
-          style={{
-            fontFamily: "'Archivo', sans-serif",
-            fontSize: '1.25rem', fontWeight: 900,
-            color: '#F0F4FF', background: 'none', border: 'none',
-            cursor: 'none', letterSpacing: '0.04em'
-          }}
+          className="border-0 bg-transparent font-[Archivo,sans-serif] text-xl font-black tracking-[0.04em] text-[#F0F4FF]"
+          style={{ padding: '0.5rem 0.25rem' }}
         >
-          PK<span style={{ color: '#39FF6A' }}>.</span>
+          PK<span className="text-[#39FF6A]">.</span>
         </button>
 
         {/* Menu trigger */}
         <button
-          onClick={() => setMenuOpen(o => !o)}
-          style={{
-            background: 'none', border: 'none', color: '#F0F4FF',
-            cursor: 'none', padding: '8px', display: 'flex',
-            alignItems: 'center', justifyContent: 'center'
-          }}
+          onClick={() => setMenuOpen(true)}
+          className="flex items-center justify-center border-0 bg-transparent text-[#F0F4FF]"
+          style={{ padding: '0.75rem' }}
           aria-label="Open menu"
         >
-          <Menu size={30} strokeWidth={1.5} />
+          <Menu size={28} strokeWidth={1.5} />
         </button>
-      </motion.nav>
+      </nav>
 
-      {/* Right-side navigation panel */}
-      <AnimatePresence>
-        {menuOpen && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(0,0,0,0.68)' }}>
-            <motion.aside
-              key="side-menu"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                position: 'absolute', top: 0, right: 0, bottom: 0,
-                width: 'min(100%, 480px)',
-                background: '#303030',
-                padding: 'clamp(5rem, 12vh, 8rem) clamp(2rem, 6vw, 5rem)',
-                color: '#F0F4FF',
-              }}
-            >
-            <button
-              onClick={() => setMenuOpen(false)}
-              style={{
-                position: 'absolute', top: '1.5rem', right: '2rem',
-                background: 'none', border: 'none', color: '#F0F4FF', cursor: 'none'
-              }}
-              aria-label="Close menu"
-            >
-              <X size={32} strokeWidth={1.5} />
-            </button>
+      {/* Backdrop — always mounted, animated via GSAP opacity/pointer-events */}
+      <div
+        ref={backdropRef}
+        className="fixed inset-0 z-[2000] bg-black/70 opacity-0"
+        style={{ pointerEvents: 'none' }}
+        onClick={() => setMenuOpen(false)}
+      >
+        {/* Panel — always mounted, animated via GSAP xPercent */}
+        <aside
+          ref={panelRef}
+          onClick={(e) => e.stopPropagation()}
+          className="absolute bottom-0 right-0 top-0 w-[min(100%,500px)] bg-[#303030] text-[#F0F4FF]"
+          style={{
+            padding: 'clamp(6rem, 14vh, 9rem) clamp(2rem, 6vw, 5rem) clamp(2rem, 6vw, 5rem)',
+          }}
+        >
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="absolute border-0 bg-transparent text-[#F0F4FF]"
+            style={{ top: 'clamp(1.5rem, 4vh, 2.25rem)', right: 'clamp(1.5rem, 4vw, 2rem)' }}
+            aria-label="Close menu"
+          >
+            <X size={32} strokeWidth={1.5} />
+          </button>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(2rem, 7vw, 5rem)' }}>
-                <div>
-                  <p style={{ color: '#b5b5b5', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '2rem' }}>Social</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {SOCIALS.map(social => (
-                      <a key={social.label} href={social.href} style={{ color: '#F0F4FF', textDecoration: 'none', fontSize: '1rem' }}>
-                        {social.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <p style={{ color: '#b5b5b5', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '2rem' }}>Menu</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {LINKS.map((link, index) => (
-                      <motion.button
-                        key={link.href}
-                        initial={{ opacity: 0, x: 18 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.06 + 0.15 }}
-                        onClick={() => scrollTo(link.href)}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '0.7rem',
-                          padding: 0, border: 0, background: 'none', cursor: 'none',
-                          color: active === link.href ? '#F0F4FF' : '#F0F4FF',
-                          fontSize: '1rem', textAlign: 'left'
-                        }}
-                      >
-                        <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: ['#FBBF24', '#60A5FA', '#2DD4BF', '#818CF8', '#39FF6A'][index] }} />
-                        {link.label}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
+          <div className="grid grid-cols-2" style={{ gap: 'clamp(2rem, 7vw, 5rem)' }}>
+            <div>
+              <p className="mb-8 text-[0.85rem] uppercase text-[#b5b5b5]">Social</p>
+              <div className="flex flex-col gap-5">
+                {SOCIALS.map(social => (
+                  <a key={social.label} href={social.href} className="text-base text-[#F0F4FF] no-underline">
+                    {social.label}
+                  </a>
+                ))}
               </div>
+            </div>
 
-              <div style={{ position: 'absolute', left: 'clamp(2rem, 6vw, 5rem)', right: 'clamp(2rem, 6vw, 5rem)', bottom: '3rem' }}>
-                <p style={{ color: '#b5b5b5', fontSize: '0.85rem', textTransform: 'uppercase', marginBottom: '1.5rem' }}>Get in touch</p>
-                <a href="mailto:princekaushal357@gmail.com" style={{ color: '#F0F4FF', textDecoration: 'none', fontSize: '1rem' }}>
-                  princekaushal357@gmail.com
-                </a>
+            <div>
+              <p className="mb-8 text-[0.85rem] uppercase text-[#b5b5b5]">Menu</p>
+              <div className="flex flex-col gap-5">
+                {LINKS.map((link, index) => (
+                  <button
+                    key={link.href}
+                    onClick={() => scrollTo(link.href)}
+                    aria-current={active === link.href ? 'page' : undefined}
+                    className="flex items-center gap-[0.7rem] border-0 bg-transparent p-0 text-left text-base text-[#F0F4FF]"
+                  >
+                    <span className={`h-[9px] w-[9px] rounded-full ${DOT_COLORS[index]}`} />
+                    {link.label}
+                  </button>
+                ))}
               </div>
-            </motion.aside>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+
+          <div className="absolute bottom-12" style={{ left: 'clamp(2rem, 6vw, 5rem)', right: 'clamp(2rem, 6vw, 5rem)' }}>
+            <p className="mb-6 text-[0.85rem] uppercase text-[#b5b5b5]">Get in touch</p>
+            <a href="mailto:princekaushal357@gmail.com" className="text-base text-[#F0F4FF] no-underline">
+              princekaushal357@gmail.com
+            </a>
+          </div>
+        </aside>
+      </div>
     </>
   )
 }

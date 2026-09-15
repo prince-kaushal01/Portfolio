@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const PROJECTS = [
   // Placeholder previews: replace these with real project screenshots later.
@@ -52,103 +48,73 @@ const PROJECTS = [
   },
 ];
 
-export default function Projects({ size = '1.4em', duration = 8, color = '#F0F4FF' }) {
-  const sectionRef = useRef(null);
+export default function Projects({ size = '1.4em', color = '#F0F4FF' }) {
   const [hoveredId, setHoveredId] = useState(null);
+  const asteriskRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".project-card", {
-        opacity: 0,
-        y: 50,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-        },
+      gsap.to(asteriskRef.current, {
+        rotate: 360,
+        duration: 8,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "center center",
       });
-    }, sectionRef);
+    });
     return () => ctx.revert();
   }, []);
 
   return (
     <section
       id="projects"
-      ref={sectionRef}
+      className="border-t border-white/[0.09]"
       style={{
-        padding: "clamp(5rem, 10vw, 8rem) clamp(1.5rem, 13.7vw, 12rem)",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
+        paddingLeft: 'clamp(1.5rem, 12vw, 260px)',
+        paddingRight: 'clamp(1.5rem, 6vw, 140px)',
+        paddingTop: 'clamp(5rem, 10vw, 8rem)',
+        paddingBottom: 'clamp(5rem, 10vw, 8rem)',
       }}
     >
-      <div style={{ marginBottom: "clamp(3rem, 6vw, 5rem)" }}>
+      <div style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
         <p
-          style={{
-            fontFamily: "'Archivo', sans-serif",
-            fontSize: "clamp(1.3rem, 2vw, 1.65rem)",
-            letterSpacing: "0.02em",
-            color: "#F0F4FF",
-            textTransform: "uppercase",
-            margin: 0,
-            fontWeight: 500,
-          }}
+          className="m-0 flex items-center font-[Archivo,sans-serif] font-medium uppercase tracking-[0.02em] text-[#F0F4FF]"
+          style={{ fontSize: 'clamp(1.3rem, 2vw, 1.65rem)', gap: '0.5rem' }}
         >
           <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              width: "1.4em",
-              height: "1.4em",
-              verticalAlign: "middle",
-            }}
+            ref={asteriskRef}
+            style={{ display: 'inline-flex', width: size, height: size, willChange: 'transform' }}
           >
-            <motion.span
-              style={{
-                display: "inline-flex",
-                width: size,
-                height: size,
-                verticalAlign: "middle",
-                willChange: "transform",
-              }}
-              animate={{ rotate: 360 }}
-              transition={{ duration, ease: "linear", repeat: Infinity }}
-            >
-              <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none">
-                {[0, 60, 120].map((angle) => (
-                  <line
-                    key={angle}
-                    x1="12"
-                    y1="4"
-                    x2="12"
-                    y2="20"
-                    stroke={color}
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    transform={`rotate(${angle} 12 12)`}
-                  />
-                ))}
-              </svg>
-            </motion.span>
+            <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none">
+              {[0, 60, 120].map((angle) => (
+                <line
+                  key={angle}
+                  x1="12"
+                  y1="4"
+                  x2="12"
+                  y2="20"
+                  stroke={color}
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  transform={`rotate(${angle} 12 12)`}
+                />
+              ))}
+            </svg>
           </span>
-          &nbsp; Selected Projects
+          Selected Projects
         </p>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(1.5rem, 3vw, 3rem)",
-        }}
-      >
+      <div className="flex flex-col" style={{ gap: 'clamp(1.5rem, 3vw, 3rem)' }}>
         {PROJECTS.map((project, index) => (
           <ProjectCard
             key={project.id}
             project={project}
             index={index}
-            hoveredId={hoveredId}
-            setHoveredId={setHoveredId}
+            isHovered={hoveredId === project.id}
+            isDimmed={hoveredId !== null && hoveredId !== project.id}
+            onHoverStart={() => setHoveredId(project.id)}
+            onHoverEnd={() => setHoveredId(null)}
           />
         ))}
       </div>
@@ -156,157 +122,126 @@ export default function Projects({ size = '1.4em', duration = 8, color = '#F0F4F
   );
 }
 
-function ProjectCard({ project, index, hoveredId, setHoveredId }) {
-  const cardRef = useRef(null);
-  const parallaxRef = useRef(null);
+function ProjectCard({ project, index, isHovered, isDimmed, onHoverStart, onHoverEnd }) {
   const indexLabel = `0${index + 1}`;
-  const isHovered = hoveredId === project.id;
-  const isDimmed = hoveredId !== null && !isHovered;
+
+  const rowRef = useRef(null);
+  const titleRef = useRef(null);
+  const iconRef = useRef(null);
+  const imageWrapRef = useRef(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        parallaxRef.current,
-        { y: -24 },
-        {
-          y: 24,
-          ease: "none",
-          scrollTrigger: {
-            trigger: cardRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        },
-      );
-    }, cardRef);
+      // Row-level dim/undim — runs for every row on any hover change.
+      gsap.to(rowRef.current, {
+        opacity: isDimmed ? 0.35 : 1,
+        duration: 0.4,
+        ease: "power2.out",
+      });
+
+      if (isHovered) {
+        gsap.set(rowRef.current, { zIndex: 5 });
+        gsap.to(titleRef.current, { color: "#39FF6A", duration: 0.55, ease: "power2.out" });
+        gsap.to(iconRef.current, {
+          opacity: 1,
+          scale: 1,
+          x: 0,
+          duration: 0.35,
+          ease: "power2.out",
+          delay: 0.08,
+        });
+        gsap.to(imageWrapRef.current, {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          duration: 0.5,
+          ease: "power3.out",
+        });
+      } else {
+        gsap.to(titleRef.current, { color: "#F0F4FF", duration: 0.45, ease: "power2.out" });
+        gsap.to(iconRef.current, {
+          opacity: 0,
+          scale: 0.6,
+          x: -4,
+          duration: 0.3,
+          ease: "power2.in",
+        });
+        gsap.to(imageWrapRef.current, {
+          opacity: 0,
+          x: 20,
+          scale: 0.96,
+          duration: 0.4,
+          ease: "power2.in",
+          onComplete: () => gsap.set(rowRef.current, { zIndex: 1 }),
+        });
+      }
+    });
 
     return () => ctx.revert();
-  }, []);
+  }, [isHovered, isDimmed]);
 
   return (
-    <motion.a
+    <a
       href={project.live}
-      ref={cardRef}
-      className="project-card"
-      whileHover="hovered"
-      onHoverStart={() => setHoveredId(project.id)}
-      onHoverEnd={() => setHoveredId(null)}
-      style={{
-        display: "grid",
-        gridTemplateColumns: "42px minmax(0, 1fr)",
-        alignItems: "center",
-        gap: "1rem",
-        minHeight: "clamp(6rem, 10vw, 8rem)",
-        padding: "0.75rem 0",
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
-        color: "#F0F4FF",
-        textDecoration: "none",
-        position: "relative",
-        zIndex: 1,
-      }}
-      animate={{ opacity: isDimmed ? 0.35 : 1 }}
-      transition={{ opacity: { duration: 0.45, ease: "easeOut" } }}
-      variants={{ hovered: { zIndex: 5 } }}
+      ref={rowRef}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+      className="project-card relative grid min-h-[clamp(6rem,10vw,8rem)] grid-cols-[42px_minmax(0,1fr)] items-center gap-4 border-b border-white/10 py-3 text-[#F0F4FF] no-underline"
+      style={{ zIndex: 1 }}
     >
-      <div
-        style={{
-          fontFamily: "'Archivo', sans-serif",
-          fontSize: "0.9rem",
-          fontWeight: 700,
-          color: "#8892A4",
-          letterSpacing: "0.1em",
-          alignSelf: "start",
-          paddingTop: "0.7rem",
-        }}
-      >
+      <div className="self-start pt-[0.7rem] font-[Archivo,sans-serif] text-[0.9rem] font-bold tracking-[0.1em] text-[#8892A4]">
         {indexLabel}
       </div>
 
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <motion.h3
-            variants={{ hovered: { color: "#39FF6A" } }}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-            style={{
-              margin: 0,
-              fontFamily: "'Archivo', sans-serif",
-              fontSize: "clamp(2rem, 4.2vw, 4.25rem)",
-              fontWeight: 900,
-              color: "#F0F4FF",
-              letterSpacing: "-0.045em",
-              lineHeight: 0.95,
-            }}
+        <div className="flex items-center gap-5">
+          <h3
+            ref={titleRef}
+            className="mb-0 font-[Archivo,sans-serif] text-[clamp(2rem,4.2vw,4.25rem)] font-black leading-[1.5] tracking-[-0.045em]"
+            style={{ color: "#F0F4FF" }}
           >
             {project.name}
-          </motion.h3>
+          </h3>
 
-          <motion.div
-            variants={{
-              hovered: { color: "#39FF6A", opacity: 1, scale: 1, x: 0 },
-            }}
-            initial={{ opacity: 0, scale: 0.6, x: -4 }}
-            transition={{ duration: 0.35, ease: "easeOut", delay: 0.1 }}
-            style={{ color: "#8892A4", transformOrigin: "center" }}
+          <span
+            ref={iconRef}
+            className="inline-flex"
+            style={{ opacity: 0, transform: "scale(0.6) translateX(-4px)", color: "#39FF6A" }}
           >
             <ExternalLink size={28} strokeWidth={1.5} />
-          </motion.div>
+          </span>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "0.65rem",
-            marginTop: "0.75rem",
-          }}
-        >
+        <div className="mt-5 flex flex-wrap gap-[0.65rem]">
           {project.stack.map((tech) => (
             <span
               key={tech}
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 500,
-                color: "#8892A4",
-                letterSpacing: "0.02em",
-                transition: "color 0.55s ease-out",
-              }}
+              className="text-[0.72rem] font-medium tracking-[0.02em] text-[#8892A4]"
             >
               {tech}{" "}
-              <span style={{ color: "#4B5563", marginLeft: "0.35rem" }}>•</span>
+              <span className="ml-[0.35rem] text-[#4B5563]">•</span>
             </span>
           ))}
         </div>
       </div>
 
       <div
-        ref={parallaxRef}
-        style={{
-          position: "absolute",
-          zIndex: -1,
-          top: "50%",
-          right: "8%",
-          width: "min(26vw, 330px)",
-          aspectRatio: "3 / 4",
-          transform: "translateY(-50%)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.45)",
-          pointerEvents: "none",
-        }}
+        ref={imageWrapRef}
+        className="pointer-events-none absolute right-[8%] top-1/2 aspect-[3/4] w-[min(26vw,330px)] -translate-y-1/2 shadow-[0_24px_60px_rgba(0,0,0,0.45)]"
+        style={{ opacity: 0, transform: "translateX(20px) scale(0.96)", zIndex: -1 }}
       >
-        <motion.img
+        <img
           src={project.preview}
           alt=""
           aria-hidden="true"
-          variants={{ hovered: { opacity: 1, x: 0, y: 0 } }}
-          initial={{ opacity: 0, x: 20, y: 8 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            pointerEvents: "none",
-          }}
+          className="h-full w-full object-cover"
         />
       </div>
-    </motion.a>
+    </a>
   );
 }

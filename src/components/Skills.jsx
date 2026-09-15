@@ -1,7 +1,3 @@
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion } from "framer-motion";
 import {
   SiReact,
   SiNextdotjs,
@@ -29,8 +25,6 @@ import {
   SiZapier,
 } from "react-icons/si";
 import { BrainCircuit, Workflow, Sparkles } from "lucide-react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const SKILL_GROUPS = [
   {
@@ -94,141 +88,73 @@ const SKILL_GROUPS = [
   },
 ];
 
-export default function Skills({ size = '1.2em', duration = 8, color = '#F0F4FF' }) {
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(".skill-chip", {
-        opacity: 0,
-        y: 24,
-        scale: 0.9,
-        duration: 0.5,
-        stagger: 0.04,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-        },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
-
+export default function Skills({ size = '1.2em', color = '#F0F4FF' }) {
   return (
     <section
       id="skills"
-      ref={sectionRef}
+      className="relative border-t border-white/[0.04]"
       style={{
-        padding: "clamp(5rem, 10vw, 8rem) clamp(1.5rem, 13.7vw, 12rem)",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
-        position: "relative",
+        paddingLeft: 'clamp(1.5rem, 12vw, 260px)',
+        paddingRight: 'clamp(1.5rem, 6vw, 140px)',
+        paddingTop: 'clamp(5rem, 10vw, 8rem)',
+        paddingBottom: 'clamp(5rem, 10vw, 8rem)',
       }}
     >
       {/* Glow */}
       <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bg-[radial-gradient(circle,rgba(57,255,106,0.04)_0%,transparent_65%)]"
         style={{
-          position: "absolute",
-          top: "20%",
-          right: "-10%",
-          width: "50vw",
-          height: "50vw",
-          maxWidth: "700px",
-          background:
-            "radial-gradient(circle, rgba(57,255,106,0.04) 0%, transparent 65%)",
-          pointerEvents: "none",
+          right: '-10%',
+          top: '20%',
+          height: '50vw',
+          width: '50vw',
+          maxWidth: '700px',
         }}
       />
 
-      <div style={{ marginBottom: "clamp(3rem, 6vw, 5rem)" }}>
+      <div style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
         <p
-          style={{
-            fontFamily: "'Archivo', sans-serif",
-            fontSize: "clamp(1.3rem, 2vw, 1.65rem)",
-            letterSpacing: "0.02em",
-            color: "#F0F4FF",
-            textTransform: "uppercase",
-            margin: 0,
-            fontWeight: 500,
-          }}
+          className="m-0 flex items-center font-[Archivo,sans-serif] font-medium uppercase tracking-[0.02em] text-[#F0F4FF]"
+          style={{ fontSize: 'clamp(1.3rem, 2vw, 1.65rem)', gap: '0.5rem' }}
         >
-          <span
-            style={{
-              position: "relative",
-              display: "inline-block",
-              width: "1.4em",
-              height: "1.4em",
-              verticalAlign: "middle",
-            }}
-          >
-            <motion.span
-              style={{
-                display: "inline-flex",
-                width: size,
-                height: size,
-                verticalAlign: "middle",
-                willChange: "transform",
-              }}
-              animate={{ rotate: 360 }}
-              transition={{ duration, ease: "linear", repeat: Infinity }}
-            >
-              <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none">
-                {[0, 60, 120].map((angle) => (
-                  <line
-                    key={angle}
-                    x1="12"
-                    y1="4"
-                    x2="12"
-                    y2="20"
-                    stroke={color}
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    transform={`rotate(${angle} 12 12)`}
-                  />
-                ))}
-              </svg>
-            </motion.span>
+          <span style={{ display: 'inline-flex', width: size, height: size }}>
+            <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none">
+              {[0, 60, 120].map((angle) => (
+                <line
+                  key={angle}
+                  x1="12"
+                  y1="4"
+                  x2="12"
+                  y2="20"
+                  stroke={color}
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  transform={`rotate(${angle} 12 12)`}
+                />
+              ))}
+            </svg>
           </span>
-          &nbsp; My Stack
+          My Stack
         </p>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "clamp(4rem, 8vw, 7rem)",
-        }}
-      >
+      <div className="flex flex-col" style={{ gap: 'clamp(4rem, 8vw, 7rem)' }}>
         {SKILL_GROUPS.map((group) => (
           <div
             key={group.category}
-            className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(180px,0.7fr)_minmax(0,1.5fr)] md:gap-[clamp(2rem,7vw,7rem)]"
+            className="grid grid-cols-1 items-start md:grid-cols-[minmax(180px,0.7fr)_minmax(0,1.5fr)]"
+            style={{ gap: 'clamp(2rem, 7vw, 7rem)' }}
           >
             <h3
-              style={{
-                fontFamily: "'Archivo', sans-serif",
-                fontSize: "clamp(2rem, 3.4vw, 3.25rem)",
-                fontWeight: 900,
-                color: "#b8b8b8",
-                letterSpacing: "-0.04em",
-                textTransform: "uppercase",
-                margin: 0,
-                lineHeight: 0.95,
-              }}
+              className="m-0 font-[Archivo,sans-serif] font-black uppercase leading-[0.95] tracking-[-0.04em] text-[#b8b8b8]"
+              style={{ fontSize: 'clamp(2rem, 3.4vw, 3.25rem)' }}
             >
               {group.category}
             </h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: "2rem 2.5rem",
-              }}
-              className="w-[100%]"
-            >
+            <div className="grid w-full grid-cols-3 gap-x-10 gap-y-8">
               {group.skills.map((skill) => (
-                <SkillChip key={skill.name} skill={skill} color={group.color} />
+                <SkillChip key={skill.name} skill={skill} />
               ))}
             </div>
           </div>
@@ -238,34 +164,19 @@ export default function Skills({ size = '1.2em', duration = 8, color = '#F0F4FF'
   );
 }
 
-function SkillChip({ skill, color }) {
+function SkillChip({ skill }) {
   return (
-    <motion.div
-      className="skill-chip"
-      whileHover={{
-        scale: 1.07,
-        borderColor: color,
-        boxShadow: `0 0 14px ${color}33`,
-        color: color,
-      }}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.8rem",
-        minHeight: "2.5rem",
-        fontSize: "clamp(1.15rem, 1.6vw, 1.5rem)",
-        fontWeight: 400,
-        color: "#b8b8b8",
-        cursor: "default",
-        transition: "color 0.2s",
-      }}
+    <div
+      className="flex min-h-10 cursor-default items-center gap-3 font-normal text-[#b8b8b8]"
+      style={{ fontSize: 'clamp(1.15rem, 1.6vw, 1.5rem)' }}
     >
       <span
-        style={{ fontSize: "2em", display: "flex", color: skill.iconColor }}
+        className="flex text-[2em] text-[var(--skill-color)]"
+        style={{ '--skill-color': skill.iconColor }}
       >
         {skill.icon}
       </span>
       {skill.name}
-    </motion.div>
+    </div>
   );
 }

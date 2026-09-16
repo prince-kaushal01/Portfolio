@@ -31,39 +31,32 @@ export default function Hero() {
 
     const statItems = stats.querySelectorAll('[data-stat]')
 
-    // Set initial states — bg starts invisible, all text starts above & hidden
     gsap.set(bg, { opacity: 0 })
     gsap.set([headline, tagline, buttons, availability], { y: -48, opacity: 0 })
     gsap.set(statItems, { y: -48, opacity: 0 })
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    // 1. BG image fades in
     tl.to(bg, { opacity: 1, duration: 1.1 })
-
-    // 2. Content div items drop in one by one
-    tl.to(headline,     { y: 0, opacity: 1, duration: 0.5 }, '+=0.1')
+    tl.to(headline,     { y: 0, opacity: 1, duration: 0.6  }, '+=0.1')
     tl.to(tagline,      { y: 0, opacity: 1, duration: 0.55 }, '-=0.25')
-    tl.to(buttons,      { y: 0, opacity: 1, duration: 0.5  }, '-=0.3')
-    tl.to(availability, { y: 0, opacity: 1, duration: 0.45 }, '-=0.4')
-
-    // 3. Stats drop in one by one
-    tl.to(statItems, { y: 0, opacity: 1, duration: 0.5, stagger: 0.15 }, '-=0.3')
+    tl.to(buttons,      { y: 0, opacity: 1, duration: 0.5  }, '-=0.2')
+    tl.to(availability, { y: 0, opacity: 1, duration: 0.45 }, '-=0.2')
+    tl.to(statItems,    { y: 0, opacity: 1, duration: 0.5, stagger: 0.15 }, '-=0.3')
 
     return () => { tl.kill() }
   }, [])
 
+  // ── Role rotation ────────────────────────────────────────────────────────
   useEffect(() => {
     const intervalId = setInterval(() => {
       setRoleIndex(current => (current + 1) % ROLES.length)
     }, 2000)
-
     return () => clearInterval(intervalId)
   }, [])
 
   useEffect(() => {
     if (!roleRef.current) return
-
     gsap.fromTo(
       roleRef.current,
       { yPercent: -100, opacity: 0 },
@@ -71,6 +64,7 @@ export default function Hero() {
     )
   }, [roleIndex])
 
+  // ── Gold spotlight cursor (desktop only) ────────────────────────────────
   useEffect(() => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
 
@@ -78,10 +72,8 @@ export default function Hero() {
     const reveal = revealRef.current
     if (!section || !reveal) return
 
-    let cursorX = 0
-    let cursorY = 0
-    let targetX = 0
-    let targetY = 0
+    let cursorX = 0, cursorY = 0
+    let targetX = 0, targetY = 0
     let frameId = null
     let active = false
 
@@ -103,7 +95,6 @@ export default function Hero() {
       targetX = event.clientX - bounds.left
       targetY = event.clientY - bounds.top
       reveal.style.opacity = '1'
-
       if (!active) {
         active = true
         frameId = requestAnimationFrame(updateReveal)
@@ -156,7 +147,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0 z-[1] block h-full w-full select-none object-cover object-center opacity-10"
       />
 
-      {/* Cursor spotlight hover layer */}
+      {/* ── Layer 3: gold spotlight — follows cursor ──────────────────── */}
       <img
         ref={revealRef}
         src={GOLD_URL}

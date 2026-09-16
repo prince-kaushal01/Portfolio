@@ -6,6 +6,7 @@ import Projects from './components/Projects.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
+import Particles from './components/Particles.jsx'
 import { initLenis, destroyLenis } from './lib/lenis.js'
 
 export default function App() {
@@ -16,9 +17,31 @@ export default function App() {
 
   return (
     <>
-      <Navbar />
-      <ScrollProgress />
-      <div>
+      {/* ── Fixed particle bg — viewport-locked, never scrolls ───────── */}
+      <div style={{
+        position:      'fixed',
+        inset:         0,
+        zIndex:        0,
+        pointerEvents: 'none',
+      }}>
+        <Particles
+          particleColors={['#ffffff', '#ffffff', '#aaaaaa']}
+          particleCount={180}
+          particleSpread={8}
+          speed={0.04}
+          particleBaseSize={120}
+          alphaParticles={false}
+          sizeRandomness={1}
+          disableRotation={false}
+          cameraDistance={20}
+          pixelRatio={window.devicePixelRatio || 1}
+        />
+      </div>
+
+      {/* ── All page content sits above the fixed canvas ─────────────── */}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Navbar />
+        <ScrollProgress />
         <main>
           <Hero />
           <About />

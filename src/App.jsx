@@ -6,8 +6,14 @@ import Projects from './components/Projects.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
+import { initLenis, destroyLenis } from './lib/lenis.js'
 
 export default function App() {
+  useEffect(() => {
+    initLenis()
+    return () => destroyLenis()
+  }, [])
+
   return (
     <>
       <Navbar />

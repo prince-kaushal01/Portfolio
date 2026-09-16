@@ -10,7 +10,48 @@ export default function Hero() {
   const sectionRef = useRef(null)
   const revealRef = useRef(null)
   const roleRef = useRef(null)
+  const bgImageRef = useRef(null)
+  const headlineRef = useRef(null)
+  const taglineRef = useRef(null)
+  const buttonsRef = useRef(null)
+  const availabilityRef = useRef(null)
+  const statsRef = useRef(null)
   const [roleIndex, setRoleIndex] = useState(0)
+
+  // ── Page-load entrance animation ────────────────────────────────────────
+  useEffect(() => {
+    const bg = bgImageRef.current
+    const headline = headlineRef.current
+    const tagline = taglineRef.current
+    const buttons = buttonsRef.current
+    const availability = availabilityRef.current
+    const stats = statsRef.current
+
+    if (!bg || !headline || !tagline || !buttons || !availability || !stats) return
+
+    const statItems = stats.querySelectorAll('[data-stat]')
+
+    // Set initial states — bg starts invisible, all text starts above & hidden
+    gsap.set(bg, { opacity: 0 })
+    gsap.set([headline, tagline, buttons, availability], { y: -48, opacity: 0 })
+    gsap.set(statItems, { y: -48, opacity: 0 })
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    // 1. BG image fades in
+    tl.to(bg, { opacity: 1, duration: 1.1 })
+
+    // 2. Content div items drop in one by one
+    tl.to(headline,     { y: 0, opacity: 1, duration: 0.5 }, '+=0.1')
+    tl.to(tagline,      { y: 0, opacity: 1, duration: 0.55 }, '-=0.25')
+    tl.to(buttons,      { y: 0, opacity: 1, duration: 0.5  }, '-=0.3')
+    tl.to(availability, { y: 0, opacity: 1, duration: 0.45 }, '-=0.4')
+
+    // 3. Stats drop in one by one
+    tl.to(statItems, { y: 0, opacity: 1, duration: 0.5, stagger: 0.15 }, '-=0.3')
+
+    return () => { tl.kill() }
+  }, [])
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -98,6 +139,7 @@ export default function Hero() {
     >
       {/* ── Layer 1: clean portrait ───────────────────────────────────── */}
       <img
+        ref={bgImageRef}
         src={PORTRAIT_URL}
         alt=""
         aria-hidden="true"
@@ -142,6 +184,7 @@ export default function Hero() {
         {/* ── Headline block ────────────────────────────────────────── */}
         <div style={{ width: 'min(100%, 640px)' }}>
           <h1
+            ref={headlineRef}
             className="m-0 min-h-[1.76em] overflow-hidden text-left font-[Archivo,sans-serif] text-[clamp(2rem,5.4vw,4.25rem)] font-black uppercase leading-[0.88] tracking-[-0.055em] text-[#f0f0ee]"
           >
             <span ref={roleRef} className="block">
@@ -156,6 +199,7 @@ export default function Hero() {
 
           {/* Tagline */}
           <p
+            ref={taglineRef}
             className="max-w-[500px] font-[Inter,sans-serif] font-normal tracking-[0.01em] text-[rgba(240,244,255,0.7)]"
             style={{
               marginTop: 'clamp(1.5rem, 3vw, 2.25rem)',
@@ -168,6 +212,7 @@ export default function Hero() {
 
           {/* Buttons */}
           <div
+            ref={buttonsRef}
             className="pointer-events-auto flex flex-wrap items-center gap-4"
             style={{ marginTop: 'clamp(1.75rem, 3.4vw, 2.75rem)' }}
           >
@@ -193,6 +238,7 @@ export default function Hero() {
 
           {/* Availability status */}
           <div
+            ref={availabilityRef}
             className="pointer-events-auto inline-flex items-center gap-2 font-[Inter,sans-serif] text-[15px] tracking-[0.05em] text-[rgba(240,244,255,0.62)]"
             style={{ marginTop: 'clamp(1rem, 2vw, 1.5rem)' }}
           >
@@ -203,6 +249,7 @@ export default function Hero() {
 
         {/* ── Stats block ───────────────────────────────────────────── */}
         <div
+          ref={statsRef}
           className="absolute flex flex-col text-right"
           style={{
             bottom: 'clamp(2rem, 8vh, 4.5rem)',
@@ -215,7 +262,7 @@ export default function Hero() {
             ['7+', 'Completed Projects'],
             ['10k+', 'Working Hours'],
           ].map(([value, label]) => (
-            <div key={label}>
+            <div key={label} data-stat>
               <strong
                 className="block font-[Archivo,sans-serif] leading-[0.9] tracking-[-0.05em] text-[#39FF6A]"
                 style={{ fontSize: 'clamp(1.9rem, 3.2vw, 2.85rem)' }}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { X, Menu } from 'lucide-react'
+import { getLenis } from '../lib/lenis.js'
 
 const LINKS = [
   { label: 'Home', href: '#home' },
@@ -93,7 +94,9 @@ export default function Navbar() {
     setMenuOpen(false)
     const el = document.querySelector(href)
     if (!el) return
-    el.scrollIntoView({ behavior: 'smooth' })
+    const lenis = getLenis()
+    if (lenis) lenis.scrollTo(el, { offset: -80, duration: 1.4 })
+    else el.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (

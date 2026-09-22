@@ -12,10 +12,10 @@ const LINKS = [
 ]
 
 const SOCIALS = [
-  { label: 'GitHub', href: '#' },
-  { label: 'LinkedIn', href: '#' },
-  { label: 'Instagram', href: '#' },
-  { label: 'Email', href: 'mailto:princekaushal357@gmail.com' },
+  { label: 'GitHub',    href: 'https://github.com/prince-kaushal01',                   external: true  },
+  { label: 'LinkedIn',  href: 'https://www.linkedin.com/in/prince-kaushal-928196394/', external: true  },
+  { label: 'Instagram', href: 'https://www.instagram.com/pryaxis.ai/?hl=en',           external: true  },
+  { label: 'Email',     href: 'mailto:princekaushal357@gmail.com',                      external: false },
 ]
 
 const DOT_COLORS = ['bg-amber-400', 'bg-blue-400', 'bg-teal-400', 'bg-indigo-400', 'bg-[#39FF6A]']
@@ -155,7 +155,12 @@ export default function Navbar() {
               <p className="mb-8 text-[0.85rem] uppercase text-[#b5b5b5]">Social</p>
               <div className="flex flex-col gap-5">
                 {SOCIALS.map(social => (
-                  <a key={social.label} href={social.href} className="text-base text-[#F0F4FF] no-underline">
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    {...(social.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    className="text-base text-[#F0F4FF] no-underline"
+                  >
                     {social.label}
                   </a>
                 ))}

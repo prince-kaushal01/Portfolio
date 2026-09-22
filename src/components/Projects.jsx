@@ -1,59 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
+import { PROJECTS } from "../data/projects.js";
 
-const PROJECTS = [
-  // Placeholder previews: replace these with real project screenshots later.
-  {
-    id: 1,
-    name: "Neon Commerce",
-    stack: ["Next.js", "Stripe", "PostgreSQL"],
-    live: "#",
-    preview: "/projects/neon-commerce.svg",
-  },
-  {
-    id: 2,
-    name: "Flowboard",
-    stack: ["React", "Redux", "Tailwind CSS"],
-    live: "#",
-    preview: "/projects/flowboard.svg",
-  },
-  {
-    id: 3,
-    name: "Resume Roaster",
-    stack: ["GPT-4", "Next.js", "PostgreSQL"],
-    live: "#",
-    preview: "/projects/resume-roaster.svg",
-  },
-  {
-    id: 4,
-    name: "Estate Finder",
-    stack: ["React", "Node.js", "MongoDB"],
-    live: "#",
-    preview: "/projects/estate-finder.svg",
-  },
-  {
-    id: 5,
-    name: "Insight Finance",
-    stack: ["Vue.js", "Express.js", "MySQL"],
-    live: "#",
-    preview: "/projects/insight-finance.svg",
-  },
-  {
-    id: 6,
-    name: "Agent Studio",
-    stack: ["OpenAI API", "LangChain", "n8n"],
-    live: "#",
-    preview: "/projects/agent-studio.svg",
-  },
-];
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Projects({ size = '1.4em', color = '#F0F4FF' }) {
   const [hoveredId, setHoveredId] = useState(null);
   const asteriskRef = useRef(null);
+  const headerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Spinning asterisk
       gsap.to(asteriskRef.current, {
         rotate: 360,
         duration: 8,
@@ -61,7 +23,21 @@ export default function Projects({ size = '1.4em', color = '#F0F4FF' }) {
         repeat: -1,
         transformOrigin: "center center",
       });
+
+      // "Selected Projects" header entrance
+      gsap.from(headerRef.current, {
+        opacity: 0,
+        y: 36,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: headerRef.current,
+          start: "top 88%",
+          toggleActions: "play none none none",
+        },
+      });
     });
+
     return () => ctx.revert();
   }, []);
 
@@ -76,7 +52,7 @@ export default function Projects({ size = '1.4em', color = '#F0F4FF' }) {
         paddingBottom: 'clamp(5rem, 10vw, 8rem)',
       }}
     >
-      <div style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
+      <div ref={headerRef} style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
         <p
           className="m-0 flex items-center font-[Archivo,sans-serif] font-medium uppercase tracking-[0.02em] text-[#F0F4FF]"
           style={{ fontSize: 'clamp(1.3rem, 2vw, 1.65rem)', gap: '0.5rem' }}
@@ -115,6 +91,7 @@ export default function Projects({ size = '1.4em', color = '#F0F4FF' }) {
             isDimmed={hoveredId !== null && hoveredId !== project.id}
             onHoverStart={() => setHoveredId(project.id)}
             onHoverEnd={() => setHoveredId(null)}
+            onClick={() => navigate(`/project/${project.id}`)}
           />
         ))}
       </div>
@@ -122,15 +99,43 @@ export default function Projects({ size = '1.4em', color = '#F0F4FF' }) {
   );
 }
 
-function ProjectCard({ project, index, isHovered, isDimmed, onHoverStart, onHoverEnd }) {
+function ProjectCard({ project, index, isHovered, isDimmed, onHoverStart, onHoverEnd, onClick }) {
   const indexLabel = `0${index + 1}`;
 
   const rowRef = useRef(null);
   const titleRef = useRef(null);
   const iconRef = useRef(null);
   const imageWrapRef = useRef(null);
+  const hasEntered = useRef(false);
   const isFirstRender = useRef(true);
 
+  // Scroll-triggered entrance animation
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+
+    gsap.set(el, { opacity: 0, y: 55 });
+
+    const st = ScrollTrigger.create({
+      trigger: el,
+      start: "top 88%",
+      once: true,
+      onEnter: () => {
+        hasEntered.current = true;
+        gsap.to(el, {
+          opacity: 1,
+          y: 0,
+          duration: 0.75,
+          ease: "power3.out",
+          delay: index * 0.07,
+        });
+      },
+    });
+
+    return () => st.kill();
+  }, [index]);
+
+  // Hover animation (dim / highlight / image reveal)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -138,7 +143,6 @@ function ProjectCard({ project, index, isHovered, isDimmed, onHoverStart, onHove
     }
 
     const ctx = gsap.context(() => {
-      // Row-level dim/undim — runs for every row on any hover change.
       gsap.to(rowRef.current, {
         opacity: isDimmed ? 0.35 : 1,
         duration: 0.4,
@@ -187,12 +191,12 @@ function ProjectCard({ project, index, isHovered, isDimmed, onHoverStart, onHove
   }, [isHovered, isDimmed]);
 
   return (
-    <a
-      href={project.live}
+    <div
       ref={rowRef}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
-      className="project-card relative grid min-h-[clamp(6rem,10vw,8rem)] grid-cols-[42px_minmax(0,1fr)] items-center gap-4 border-b border-white/10 py-3 text-[#F0F4FF] no-underline"
+      onClick={onClick}
+      className="project-card relative grid min-h-[clamp(6rem,10vw,8rem)] grid-cols-[42px_minmax(0,1fr)] cursor-pointer items-center gap-4 border-b border-white/10 py-3 text-[#F0F4FF]"
       style={{ zIndex: 1 }}
     >
       <div className="self-start pt-[0.7rem] font-[Archivo,sans-serif] text-[0.9rem] font-bold tracking-[0.1em] text-[#8892A4]">
@@ -242,6 +246,6 @@ function ProjectCard({ project, index, isHovered, isDimmed, onHoverStart, onHove
           className="h-full w-full object-cover"
         />
       </div>
-    </a>
+    </div>
   );
 }

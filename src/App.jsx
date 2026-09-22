@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import Hero from './components/Hero.jsx'
 import About from './components/About.jsx'
 import Skills from './components/Skills.jsx'
@@ -6,10 +7,28 @@ import Projects from './components/Projects.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
 import Navbar from './components/Navbar.jsx'
-import Particles from './components/Particles.jsx'
 import { initLenis, destroyLenis } from './lib/lenis.js'
+import ProjectDetail from './pages/ProjectDetail.jsx'
+import LoadingScreen from './components/LoadingScreen.jsx'
 
 export default function App() {
+  const [loading, setLoading] = useState(true)
+  return (
+    <>
+      {/* Loading curtain — sits above everything; unmounts after exit animation */}
+      {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Routes>
+          <Route path="/" element={<MainPage ready={!loading} />} />
+          <Route path="/project/:id" element={<ProjectDetail />} />
+        </Routes>
+      </div>
+    </>
+  )
+}
+
+function MainPage({ ready }) {
   useEffect(() => {
     initLenis()
     return () => destroyLenis()
@@ -17,40 +36,16 @@ export default function App() {
 
   return (
     <>
-      {/* ── Fixed particle bg — viewport-locked, never scrolls ───────── */}
-      <div style={{
-        position:      'fixed',
-        inset:         0,
-        zIndex:        0,
-        pointerEvents: 'none',
-      }}>
-        <Particles
-          particleColors={['#ffffff', '#ffffff', '#aaaaaa']}
-          particleCount={180}
-          particleSpread={8}
-          speed={0.04}
-          particleBaseSize={120}
-          alphaParticles={false}
-          sizeRandomness={1}
-          disableRotation={false}
-          cameraDistance={20}
-          pixelRatio={window.devicePixelRatio || 1}
-        />
-      </div>
-
-      {/* ── All page content sits above the fixed canvas ─────────────── */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <Navbar />
-        <ScrollProgress />
-        <main>
-          <Hero />
-          <About />
-          <Skills />
-          <Projects />
-          <Contact />
-        </main>
-        <Footer />
-      </div>
+      <Navbar />
+      <ScrollProgress />
+      <main>
+        <Hero ready={ready} />
+        <About />
+        <Skills />
+        <Projects />
+        <Contact />
+      </main>
+      <Footer />
     </>
   )
 }

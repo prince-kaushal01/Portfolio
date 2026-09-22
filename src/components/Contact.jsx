@@ -14,7 +14,7 @@ export default function Contact() {
     >
       {/* ── Glass card ───────────────────────────────────────────────── */}
       <div
-        className="relative mx-auto w-[80%] overflow-hidden rounded-[28px] border border-white/10 text-center"
+        className="contact-glass relative mx-auto w-full overflow-hidden rounded-[28px] border border-white/10 text-center md:w-[80%]"
         style={{
           background: 'rgba(255,255,255,0.035)',
           backdropFilter: 'blur(18px)',
@@ -47,7 +47,7 @@ export default function Contact() {
           </h2>
 
           <p
-            className="mx-auto font-[Inter,sans-serif] text-[#AEB4C0]"
+            className="contact-sub mx-auto font-[Inter,sans-serif] text-[#AEB4C0]"
             style={{
               marginBottom: 'clamp(2rem, 4vw, 2.75rem)',
               fontSize: 'clamp(0.95rem, 1.3vw, 1.2rem)',
@@ -58,7 +58,7 @@ export default function Contact() {
             Open to exciting freelance opportunities in full-stack development, AI engineering, and automation. Let&apos;s build something great together.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center" style={{ gap: '1.2rem', marginBottom: 'clamp(2.5rem, 5vw, 3.5rem)' }}>
+          <div className="contact-buttons flex flex-wrap items-center justify-center" style={{ gap: '1.2rem', marginBottom: 'clamp(2.5rem, 5vw, 3.5rem)' }}>
             <a
               href="mailto:princekaushal357@gmail.com"
               className="inline-flex items-center gap-2 rounded-2xl bg-[#39FF6A] font-[Archivo,sans-serif] text-lg font-bold text-[#0A0A0A] no-underline"
@@ -90,7 +90,7 @@ export default function Contact() {
             </a>
           </div>
 
-          <div className="border-t border-white/[0.08] w-full" style={{ paddingTop: 'clamp(1.5rem, 3vw, 2rem)' }}>
+          <div className="contact-bottom border-t border-white/[0.08] w-full" style={{ paddingTop: 'clamp(1.5rem, 3vw, 2rem)' }}>
             <a
               href="mailto:princekaushal357@gmail.com"
               className="block font-[Inter,sans-serif] text-[#8892A4] no-underline"

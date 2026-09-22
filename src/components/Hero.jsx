@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { Download, Send } from 'lucide-react'
 import PORTRAIT_URL from '../assets/face1.png'
+import PORTRAIT_MOBILE_URL from '../assets/mobile-face1.png'
 import GOLD_URL from '../assets/face3.png'
 
-const ROLES = ['Web Developer', 'AI Engineer', 'Full-Stack Developer', 'UI/UX Enthusiast']
+const ROLES = ['Web Developer', 'AI Engineer', 'Full-Stack Developer']
 
-export default function Hero() {
+export default function Hero({ ready }) {
   const sectionRef = useRef(null)
   const revealRef = useRef(null)
   const roleRef = useRef(null)
@@ -18,8 +19,26 @@ export default function Hero() {
   const statsRef = useRef(null)
   const [roleIndex, setRoleIndex] = useState(0)
 
-  // ── Page-load entrance animation ────────────────────────────────────────
+  // ── Hide all elements immediately on mount so nothing flashes ───────────
   useEffect(() => {
+    const bg = bgImageRef.current
+    const headline = headlineRef.current
+    const tagline = taglineRef.current
+    const buttons = buttonsRef.current
+    const availability = availabilityRef.current
+    const stats = statsRef.current
+    if (!bg || !headline || !tagline || !buttons || !availability || !stats) return
+
+    const statItems = stats.querySelectorAll('[data-stat]')
+    gsap.set(bg, { opacity: 0 })
+    gsap.set([headline, tagline, buttons, availability], { y: -48, opacity: 0 })
+    gsap.set(statItems, { y: -48, opacity: 0 })
+  }, [])
+
+  // ── Page-load entrance animation — fires only after loading screen exits ─
+  useEffect(() => {
+    if (!ready) return
+
     const bg = bgImageRef.current
     const headline = headlineRef.current
     const tagline = taglineRef.current
@@ -31,10 +50,6 @@ export default function Hero() {
 
     const statItems = stats.querySelectorAll('[data-stat]')
 
-    gsap.set(bg, { opacity: 0 })
-    gsap.set([headline, tagline, buttons, availability], { y: -48, opacity: 0 })
-    gsap.set(statItems, { y: -48, opacity: 0 })
-
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
     tl.to(bg, { opacity: 1, duration: 1.1 })
@@ -45,7 +60,7 @@ export default function Hero() {
     tl.to(statItems,    { y: 0, opacity: 1, duration: 0.5, stagger: 0.15 }, '-=0.3')
 
     return () => { tl.kill() }
-  }, [])
+  }, [ready])
 
   // ── Role rotation ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -129,14 +144,17 @@ export default function Hero() {
       className="relative h-screen w-full overflow-hidden font-[Archivo,sans-serif] text-[#f0f0ee]"
     >
       {/* ── Layer 1: clean portrait ───────────────────────────────────── */}
-      <img
-        ref={bgImageRef}
-        src={PORTRAIT_URL}
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-        className="pointer-events-none absolute inset-0 z-0 block h-full w-full select-none object-cover object-center"
-      />
+      <picture className="pointer-events-none absolute inset-0 z-0 block h-full w-full select-none">
+        <source media="(max-width: 767px)" srcSet={PORTRAIT_MOBILE_URL} />
+        <img
+          ref={bgImageRef}
+          src={PORTRAIT_URL}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="block h-full w-full object-cover object-top md:object-center"
+        />
+      </picture>
 
       {/* ── Layer 2: gold base at 10% ─────────────────────────────────── */}
       <img
@@ -160,12 +178,12 @@ export default function Hero() {
       {/* ── Layer 4: scrim ────────────────────────────────────────────── */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(20,24,32,0.55)_0%,rgba(20,24,32,0.12)_45%,rgba(20,24,32,0.6)_100%)]"
+        className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(10,10,10,0.15)_0%,transparent_30%,rgba(10,10,10,0.75)_68%,rgba(10,10,10,0.93)_100%)] md:bg-[linear-gradient(180deg,rgba(20,24,32,0.55)_0%,rgba(20,24,32,0.12)_45%,rgba(20,24,32,0.6)_100%)]"
       />
 
       {/* ── Content overlay ───────────────────────────────────────────── */}
       <div
-        className="pointer-events-none relative z-[4] flex h-full flex-col justify-center"
+        className="hero-content-overlay pointer-events-none relative z-[4] flex h-full flex-col justify-center"
         style={{
           paddingTop: '22vh',
           paddingLeft: 'clamp(1.5rem, 10vw, 100px)',
@@ -204,7 +222,7 @@ export default function Hero() {
           {/* Buttons */}
           <div
             ref={buttonsRef}
-            className="pointer-events-auto flex flex-wrap items-center gap-4"
+            className="hero-buttons pointer-events-auto flex flex-wrap items-center gap-4"
             style={{ marginTop: 'clamp(1.75rem, 3.4vw, 2.75rem)' }}
           >
             <button
@@ -238,10 +256,10 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ── Stats block ───────────────────────────────────────────── */}
+        {/* ── Stats block — desktop only ────────────────────────────── */}
         <div
           ref={statsRef}
-          className="absolute flex flex-col text-right"
+          className="absolute hidden flex-col text-right md:flex"
           style={{
             bottom: 'clamp(2rem, 8vh, 4.5rem)',
             right: 'clamp(1.5rem, 5vw, 4.5rem)',

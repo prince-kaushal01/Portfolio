@@ -25,6 +25,11 @@ import {
   SiZapier,
 } from "react-icons/si";
 import { BrainCircuit, Workflow, Sparkles } from "lucide-react";
+import { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const SKILL_GROUPS = [
   {
@@ -89,6 +94,75 @@ const SKILL_GROUPS = [
 ];
 
 export default function Skills({ size = '1.2em', color = '#F0F4FF' }) {
+  const asteriskRef = useRef(null);
+  const headerRef = useRef(null);
+  const groupRefs = useRef([]);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Spinning asterisk
+      gsap.to(asteriskRef.current, {
+        rotate: 360,
+        duration: 8,
+        ease: "none",
+        repeat: -1,
+        transformOrigin: "center center",
+      });
+
+      // "My Stack" header entrance
+      gsap.from(headerRef.current, {
+        opacity: 0,
+        y: 36,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: headerRef.current,
+          start: "top 88%",
+          toggleActions: "play none none none",
+        },
+      });
+
+      // Each skill group: heading + chips animate together
+      groupRefs.current.forEach((el) => {
+        if (!el) return;
+
+        const heading = el.querySelector(".group-heading");
+        const chips = el.querySelectorAll(".skill-chip");
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: el,
+            start: "top 84%",
+            toggleActions: "play none none none",
+          },
+        });
+
+        // Heading slides up
+        tl.from(heading, {
+          opacity: 0,
+          y: 50,
+          duration: 0.75,
+          ease: "power3.out",
+        });
+
+        // Chips stagger in slightly behind
+        tl.from(
+          chips,
+          {
+            opacity: 0,
+            y: 24,
+            duration: 0.55,
+            ease: "power2.out",
+            stagger: 0.055,
+          },
+          "-=0.45"
+        );
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
       id="skills"
@@ -113,12 +187,16 @@ export default function Skills({ size = '1.2em', color = '#F0F4FF' }) {
         }}
       />
 
-      <div style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
+      {/* Section header */}
+      <div ref={headerRef} style={{ marginBottom: 'clamp(3rem, 6vw, 5rem)' }}>
         <p
           className="m-0 flex items-center font-[Archivo,sans-serif] font-medium uppercase tracking-[0.02em] text-[#F0F4FF]"
           style={{ fontSize: 'clamp(1.3rem, 2vw, 1.65rem)', gap: '0.5rem' }}
         >
-          <span style={{ display: 'inline-flex', width: size, height: size }}>
+          <span
+            ref={asteriskRef}
+            style={{ display: 'inline-flex', width: size, height: size, willChange: 'transform' }}
+          >
             <svg viewBox="0 0 24 24" width="100%" height="100%" fill="none">
               {[0, 60, 120].map((angle) => (
                 <line
@@ -140,15 +218,16 @@ export default function Skills({ size = '1.2em', color = '#F0F4FF' }) {
       </div>
 
       <div className="flex flex-col" style={{ gap: 'clamp(4rem, 8vw, 7rem)' }}>
-        {SKILL_GROUPS.map((group) => (
+        {SKILL_GROUPS.map((group, i) => (
           <div
             key={group.category}
+            ref={(el) => (groupRefs.current[i] = el)}
             className="grid grid-cols-1 items-start md:grid-cols-[minmax(180px,0.7fr)_minmax(0,1.5fr)]"
             style={{ gap: 'clamp(2rem, 7vw, 7rem)' }}
           >
             <h3
-              className="m-0 font-[Archivo,sans-serif] font-black uppercase leading-[0.95] tracking-[-0.04em] text-[#b8b8b8]"
-              style={{ fontSize: 'clamp(2rem, 3.4vw, 3.25rem)' }}
+              className="group-heading m-0 font-[Archivo,sans-serif] font-black uppercase leading-[0.95] tracking-[-0.04em] text-[#b8b8b8]"
+              style={{ fontSize: 'clamp(1.4rem, 2.4vw, 2.25rem)' }}
             >
               {group.category}
             </h3>
@@ -167,11 +246,11 @@ export default function Skills({ size = '1.2em', color = '#F0F4FF' }) {
 function SkillChip({ skill }) {
   return (
     <div
-      className="flex min-h-10 cursor-default items-center gap-3 font-normal text-[#b8b8b8]"
-      style={{ fontSize: 'clamp(1.15rem, 1.6vw, 1.5rem)' }}
+      className="skill-chip flex min-h-10 cursor-default items-center gap-3 font-normal text-[#b8b8b8]"
+      style={{ fontSize: 'clamp(0.95rem, 1.3vw, 1.25rem)' }}
     >
       <span
-        className="flex text-[2em] text-[var(--skill-color)]"
+        className="flex text-[1.6em] text-[var(--skill-color)]"
         style={{ '--skill-color': skill.iconColor }}
       >
         {skill.icon}
